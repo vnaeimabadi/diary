@@ -1,5 +1,7 @@
-import PageOne from './PageOne';
-import PageTwo from './PageTwo';
 import Login from './Login';
+import DiaryList from './DiaryList';
+import DiaryYearList from './DiaryYearList';
+import AddEditDiary from './AddEditDiary';
+import DiaryDetail from './DiaryDetail';
 
-export {PageOne, PageTwo, Login};
+export {Login, DiaryList, DiaryYearList, AddEditDiary,DiaryDetail};

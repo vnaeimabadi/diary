@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useEffect} from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -8,25 +8,44 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
-
+import SplashScreen from 'react-native-splash-screen'
+import {Provider} from 'react-redux';
 import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
 
-import {PageOne, PageTwo,Login} from './screens';
+import {
+  Login,
+  DiaryList,
+  DiaryYearList,
+  AddEditDiary,
+  DiaryDetail,
+} from './screens';
+
+import store from './store/index'
 
 const Stack = createStackNavigator();
 const App = () => {
+
+  useEffect(()=>{
+    SplashScreen.hide();
+  },[])
+
   return (
-    <NavigationContainer>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-        initialRouteName={'Login'}>
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="PageTwo" component={PageTwo} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+          }}
+          initialRouteName={'Login'}>
+          <Stack.Screen name="Login" component={Login} />
+          <Stack.Screen name="DiaryYearList" component={DiaryYearList} />
+          <Stack.Screen name="DiaryList" component={DiaryList} />
+          <Stack.Screen name="DiaryDetail" component={DiaryDetail} />
+          <Stack.Screen name="AddEditDiary" component={AddEditDiary} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </Provider>
   );
 };
 
