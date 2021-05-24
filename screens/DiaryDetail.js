@@ -4,26 +4,16 @@ import {
   View,
   Text,
   StyleSheet,
-  Button,
-  TextInput,
   Image,
   TouchableOpacity,
-  Alert 
+  Alert,
 } from 'react-native';
-import {
-  insertDiaryList,
-  checkYearValidation,
-  insertDiaryToDiaryList,
-  queryDiaryListsById,
-  deleteSingleDiary,
-} from '../database/allSchemas';
+import {queryDiaryListsById, deleteSingleDiary} from '../database/allSchemas';
 
 import {useDispatch, useSelector} from 'react-redux';
 import {changedDatabaseAction} from '../store/databaseChanges';
 
-import realm from '../database/allSchemas';
-import {COLORS, FONTS, SIZES, icons, theme} from '../constants';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import {COLORS, FONTS, SIZES, icons} from '../constants';
 
 const DiaryDetail = ({navigation, route}) => {
   const id = route.params.id;
@@ -31,14 +21,10 @@ const DiaryDetail = ({navigation, route}) => {
 
   const dispatch = useDispatch();
   const detailChanged = useSelector(status => status.singleDiaryEdited);
-  const detailD = useSelector(status => status.singleDiaryDeleted);
 
   const selectedIndex = useRef(0);
   const [title, setTitle] = useState('');
-  const [titleError, setTitleError] = useState(false);
   const [details, setDetails] = useState('');
-  const [detailsError, setDetailsError] = useState(false);
-  const [height, setHeight] = useState(0);
   const [date, setDate] = useState(null);
 
   const reloadData = () => {
@@ -63,7 +49,7 @@ const DiaryDetail = ({navigation, route}) => {
       });
   };
 
-  const editDeary = () => {
+  const editDearyHandler = () => {
     navigation.navigate('AddEditDiary', {
       yearId: yearId,
       date: date.toString(),
@@ -75,27 +61,18 @@ const DiaryDetail = ({navigation, route}) => {
   };
 
   const dialogBoxHandler = () =>
-  Alert.alert(
-    "Delete Diary",
-    "Are your sure you want to delete?",
-    [
+    Alert.alert('Delete Diary', 'Are your sure you want to delete?', [
       {
-        text: "Cancel",
-        style: "cancel"
+        text: 'Cancel',
+        style: 'cancel',
       },
-      { text: "delete", onPress: deleteDeary }
-    ]
-  );
+      {text: 'delete', onPress: deleteDearyHandler},
+    ]);
 
-  const deleteDeary = () => {
+  const deleteDearyHandler = () => {
     //
     deleteSingleDiary(yearId, selectedIndex.current)
       .then(data => {
-        // setTimeout(() => {
-        //   // dispatch(changedDatabaseAction.singleDiaryDeleted());
-        //   navigation.goBack();
-        //   // navigation.navigate('DiaryList', {yearId: yearId});
-        // }, 5000)
         dispatch(changedDatabaseAction.singleDiaryDeleted());
         navigation.goBack();
       })
@@ -105,7 +82,7 @@ const DiaryDetail = ({navigation, route}) => {
       });
   };
 
-  const Header = () => {
+  const renderHeader = () => {
     return (
       <View>
         <View
@@ -116,6 +93,7 @@ const DiaryDetail = ({navigation, route}) => {
             display: 'flex',
             flexDirection: 'row',
           }}>
+          {/*diary delete button*/}
           <TouchableOpacity onPress={dialogBoxHandler}>
             <View
               style={{
@@ -131,7 +109,8 @@ const DiaryDetail = ({navigation, route}) => {
             </View>
           </TouchableOpacity>
 
-          <TouchableOpacity onPress={editDeary} style={{marginLeft: 10}}>
+          {/*diary edit button*/}
+          <TouchableOpacity onPress={editDearyHandler} style={{marginLeft: 10}}>
             <View
               style={{
                 height: 30,
@@ -143,10 +122,12 @@ const DiaryDetail = ({navigation, route}) => {
             </View>
           </TouchableOpacity>
         </View>
+
+        {/* diary logo */}
         <View style={{display: 'flex', flexDirection: 'row'}}>
           <TouchableOpacity
             onPress={() => navigation.goBack()}
-            style={{marginLeft: -10,marginRight:10}}>
+            style={{marginLeft: -10, marginRight: 10}}>
             <View
               style={{
                 height: 30,
@@ -166,20 +147,8 @@ const DiaryDetail = ({navigation, route}) => {
     );
   };
 
-  useEffect(() => {
-    reloadData();
-    // realm.addListener('change', () => {
-    //   reloadData();
-    // });
-  }, [detailChanged]);
-
-
-  return (
-    <View style={styles.container}>
-      {/* header */}
-      {Header()}
-
-      {/* title */}
+  const renderTitle = () => {
+    return (
       <View>
         <Text
           style={{
@@ -187,13 +156,15 @@ const DiaryDetail = ({navigation, route}) => {
             height: 40,
             color: COLORS.black,
             ...FONTS.body2,
-          }}
-          >
+          }}>
           {title}
         </Text>
       </View>
+    );
+  };
 
-      {/* content */}
+  const renderContent = () => {
+    return (
       <ScrollView>
         <View>
           <Text
@@ -205,6 +176,20 @@ const DiaryDetail = ({navigation, route}) => {
           </Text>
         </View>
       </ScrollView>
+    );
+  };
+
+  useEffect(() => {
+    reloadData();
+  }, [detailChanged]);
+
+  return (
+    <View style={styles.container}>
+      {renderHeader()}
+
+      {renderTitle()}
+
+      {renderContent()}
     </View>
   );
 };
@@ -220,9 +205,7 @@ const styles = StyleSheet.create({
   inputs: {
     minHeight: 40,
     marginLeft: 16,
-    // paddingTop: 10,
     overflow: 'hidden',
-    // padding: 10,
     paddingRight: 25,
     borderBottomColor: '#000000',
     flex: 1,
