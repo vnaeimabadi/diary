@@ -251,7 +251,7 @@ const DiaryYearList = ({navigation}) => {
               source={icons.logo}
               style={{width: 120 / 1.3, height: 120}}
             />
-            <Text style={{...FONTS.body2, color: 'white', marginTop: 50}}>
+            <Text style={{...FONTS.body2, color: COLORS.white, marginTop: 50}}>
               ADD TODAY'S STORY
             </Text>
           </View>
