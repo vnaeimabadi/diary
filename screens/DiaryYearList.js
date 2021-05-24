@@ -14,12 +14,11 @@ import {
   BackHandler,
 } from 'react-native';
 
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
-import {insertDiaryList, queryAllDiaryLists} from '../database/allSchemas';
-import realm from '../database/allSchemas';
+import {queryAllDiaryLists} from '../database/allSchemas';
 
-import {icons, theme, FONTS, SIZES, COLORS} from '../constants/index';
+import {icons, FONTS, SIZES, COLORS} from '../constants/index';
 
 const PLACE_ITEM_SIZE =
   Platform.OS === 'ios' ? SIZES.width / 1.25 : SIZES.width / 1.2;
