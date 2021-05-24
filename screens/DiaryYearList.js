@@ -113,6 +113,102 @@ const DiaryYearList = ({navigation}) => {
   };
 
   const renderDiaryBookByYear = () => {
+
+    const renderItem=({item, index}) => 
+    {
+      const opacity = diaryScrollX.interpolate({
+        inputRange: [
+          (index - 2) * PLACE_ITEM_SIZE,
+          (index - 1) * PLACE_ITEM_SIZE,
+          index * PLACE_ITEM_SIZE,
+        ],
+        outputRange: [0.3, 1, 0.3],
+        extrapolate: 'clamp',
+      });
+
+      let activeHeight = 0;
+      if (Platform.OS === 'ios') {
+        if (SIZES.height > 800) {
+          activeHeight = SIZES.height / 2;
+        } else {
+          activeHeight = SIZES.height / 1.65;
+        }
+      } else {
+        activeHeight = SIZES.height / 1.6;
+      }
+
+      const height = diaryScrollX.interpolate({
+        inputRange: [
+          (index - 2) * PLACE_ITEM_SIZE,
+          (index - 1) * PLACE_ITEM_SIZE,
+          index * PLACE_ITEM_SIZE,
+        ],
+        outputRange: [
+          SIZES.height / 1.9,
+          activeHeight / 1,
+          SIZES.height / 1.9,
+        ],
+        extrapolate: 'clamp',
+      });
+
+      if (index == 0 || index == diaryList.length - 1) {
+        return <View style={{width: EMPTY_ITEM_SIZE}} />;
+      } else {
+        return (
+          <Animated.View
+            opacity={opacity}
+            style={{
+              width: PLACE_ITEM_SIZE,
+              height: height,
+              alignItems: 'center',
+            }}>
+            <TouchableWithoutFeedback
+              onPress={() => SingleDiary(item.year)}>
+              <View>
+                <View
+                  style={{
+                    backgroundColor: 'red',
+                    height: '100%',
+                    borderRadius: 20,
+                    padding: 10,
+                    width: PLACE_ITEM_SIZE - 2,
+                    justifyContent: 'space-between',
+                  }}>
+                  <View
+                    style={{
+                      borderBottomColor: COLORS.white,
+                      borderBottomWidth: 1,
+                    }}>
+                    <Text style={{...FONTS.body1, color: COLORS.white}}>
+                      Diary Book
+                    </Text>
+                  </View>
+
+                  <View
+                    style={{
+                      backgroundColor: COLORS.blue,
+                      width: 90,
+                      height: 50,
+                      bottom: 0,
+                      right: 0,
+                      position: 'absolute',
+                      borderTopLeftRadius: 20,
+                      borderBottomRightRadius: 20,
+                    }}
+                  />
+                  <View style={{alignItems: 'flex-end'}}>
+                    <Text style={{...FONTS.body1, color: COLORS.white}}>
+                      {item.year}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </Animated.View>
+        );
+      }
+    }
+
     return (
       <FlatList
         data={diaryList}
@@ -131,105 +227,13 @@ const DiaryYearList = ({navigation}) => {
           [{nativeEvent: {contentOffset: {x: diaryScrollX}}}],
           {useNativeDriver: false},
         )}
-        renderItem={({item, index}) => {
-          const opacity = diaryScrollX.interpolate({
-            inputRange: [
-              (index - 2) * PLACE_ITEM_SIZE,
-              (index - 1) * PLACE_ITEM_SIZE,
-              index * PLACE_ITEM_SIZE,
-            ],
-            outputRange: [0.3, 1, 0.3],
-            extrapolate: 'clamp',
-          });
-
-          let activeHeight = 0;
-          if (Platform.OS === 'ios') {
-            if (SIZES.height > 800) {
-              activeHeight = SIZES.height / 2;
-            } else {
-              activeHeight = SIZES.height / 1.65;
-            }
-          } else {
-            activeHeight = SIZES.height / 1.6;
-          }
-
-          const height = diaryScrollX.interpolate({
-            inputRange: [
-              (index - 2) * PLACE_ITEM_SIZE,
-              (index - 1) * PLACE_ITEM_SIZE,
-              index * PLACE_ITEM_SIZE,
-            ],
-            outputRange: [
-              SIZES.height / 1.9,
-              activeHeight / 1,
-              SIZES.height / 1.9,
-            ],
-            extrapolate: 'clamp',
-          });
-
-          if (index == 0 || index == diaryList.length - 1) {
-            return <View style={{width: EMPTY_ITEM_SIZE}} />;
-          } else {
-            return (
-              <Animated.View
-                opacity={opacity}
-                style={{
-                  width: PLACE_ITEM_SIZE,
-                  height: height,
-                  alignItems: 'center',
-                }}>
-                <TouchableWithoutFeedback
-                  onPress={() => SingleDiary(item.year)}>
-                  <View>
-                    <View
-                      style={{
-                        backgroundColor: 'red',
-                        height: '100%',
-                        borderRadius: 20,
-                        padding: 10,
-                        width: PLACE_ITEM_SIZE - 2,
-                        justifyContent: 'space-between',
-                      }}>
-                      <View
-                        style={{
-                          borderBottomColor: COLORS.white,
-                          borderBottomWidth: 1,
-                        }}>
-                        <Text style={{...FONTS.body1, color: COLORS.white}}>
-                          Diary Book
-                        </Text>
-                      </View>
-
-                      <View
-                        style={{
-                          backgroundColor: COLORS.blue,
-                          width: 90,
-                          height: 50,
-                          bottom: 0,
-                          right: 0,
-                          position: 'absolute',
-                          borderTopLeftRadius: 20,
-                          borderBottomRightRadius: 20,
-                        }}
-                      />
-                      <View style={{alignItems: 'flex-end'}}>
-                        <Text style={{...FONTS.body1, color: COLORS.white}}>
-                          {item.year}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </TouchableWithoutFeedback>
-              </Animated.View>
-            );
-          }
-        }}
-        keyExtractor={item => item.id}
+        renderItem={renderItem}
+        keyExtractor={item => `${item.id}`}
       />
     );
   };
 
-  const renderDiaryAddButtonIfEmpty = () => {
+  const renderDiaryAddButtonIfEmptyDiaryList = () => {
     return (
       <TouchableWithoutFeedback onPress={addNewDiary}>
         <View
@@ -283,7 +287,7 @@ const DiaryYearList = ({navigation}) => {
       {renderHeader()}
       {diaryList.length > 0
         ? renderDiaryBookByYear()
-        : renderDiaryAddButtonIfEmpty()}
+        : renderDiaryAddButtonIfEmptyDiaryList()}
       {renderAddStoryButton()}
     </View>
   );
