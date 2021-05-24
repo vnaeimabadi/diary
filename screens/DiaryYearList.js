@@ -1,11 +1,9 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {
-  Keyboard,
   View,
   Text,
   FlatList,
   StyleSheet,
-  Button,
   Image,
   TouchableWithoutFeedback,
   Platform,
@@ -14,12 +12,11 @@ import {
   BackHandler,
 } from 'react-native';
 
-import {useDispatch, useSelector} from 'react-redux';
+import {useSelector} from 'react-redux';
 
-import {insertDiaryList, queryAllDiaryLists} from '../database/allSchemas';
-import realm from '../database/allSchemas';
+import {queryAllDiaryLists} from '../database/allSchemas';
 
-import {icons, theme, FONTS, SIZES, COLORS} from '../constants/index';
+import {icons, FONTS, SIZES, COLORS} from '../constants/index';
 
 const PLACE_ITEM_SIZE =
   Platform.OS === 'ios' ? SIZES.width / 1.25 : SIZES.width / 1.2;
@@ -113,9 +110,7 @@ const DiaryYearList = ({navigation}) => {
   };
 
   const renderDiaryBookByYear = () => {
-
-    const renderItem=({item, index}) => 
-    {
+    const renderItem = ({item, index}) => {
       const opacity = diaryScrollX.interpolate({
         inputRange: [
           (index - 2) * PLACE_ITEM_SIZE,
@@ -143,11 +138,7 @@ const DiaryYearList = ({navigation}) => {
           (index - 1) * PLACE_ITEM_SIZE,
           index * PLACE_ITEM_SIZE,
         ],
-        outputRange: [
-          SIZES.height / 1.9,
-          activeHeight / 1,
-          SIZES.height / 1.9,
-        ],
+        outputRange: [SIZES.height / 1.9, activeHeight / 1, SIZES.height / 1.9],
         extrapolate: 'clamp',
       });
 
@@ -162,8 +153,7 @@ const DiaryYearList = ({navigation}) => {
               height: height,
               alignItems: 'center',
             }}>
-            <TouchableWithoutFeedback
-              onPress={() => SingleDiary(item.year)}>
+            <TouchableWithoutFeedback onPress={() => SingleDiary(item.year)}>
               <View>
                 <View
                   style={{
@@ -207,7 +197,7 @@ const DiaryYearList = ({navigation}) => {
           </Animated.View>
         );
       }
-    }
+    };
 
     return (
       <FlatList
