@@ -5,29 +5,20 @@ import {
   Text,
   FlatList,
   StyleSheet,
-  Button,
   Image,
   TouchableWithoutFeedback,
   Platform,
-  Animated,
   TouchableOpacity,
 } from 'react-native';
 
-import {
-  insertDiaryList,
-  queryAllDiaryLists,
-  queryDiaryListsById,
-} from '../database/allSchemas';
-import realm from '../database/allSchemas';
+import {queryDiaryListsById} from '../database/allSchemas';
 
-import {useDispatch, useSelector} from 'react-redux';
-import {changedDatabaseAction} from '../store/databaseChanges';
+import {useSelector} from 'react-redux';
 
-import {icons, theme, FONTS, SIZES, COLORS} from '../constants/index';
+import {icons, FONTS, SIZES, COLORS} from '../constants/index';
 
 const PLACE_ITEM_SIZE =
   Platform.OS === 'ios' ? SIZES.width / 1.25 : SIZES.width / 1.2;
-const EMPTY_ITEM_SIZE = (SIZES.width - PLACE_ITEM_SIZE) / 2;
 
 let firstUpdate = true;
 let firstAdd = true;
@@ -40,26 +31,18 @@ const DiaryList = ({navigation, route}) => {
   const flatListRef = useRef();
   const sortType = useRef('descending');
 
-  const dispatch = useDispatch();
   const detailChanged = useSelector(status => status.singleDiaryEdited);
   const newDiaryAdded = useSelector(status => status.singleDiary);
   const diaryDeleted = useSelector(status => status.singleDiaryDeleted);
 
-  const deleteSingleYear = () => {
-    deleteAllDiaryLists()
-      .then(setDiaryList([]))
-      .catch(error => {
-        console.log('error-deleted');
-        console.log(error);
-      });
-  };
-  const addNewDiary = () => {
+  const addNewDiaryHandler = () => {
     navigation.navigate('AddEditDiary', {yearId: yearId});
   };
-  const SingleDiary = id => {
+  const singleDiaryHandler = id => {
     isDeleted.current = true;
     navigation.navigate('DiaryDetail', {id: id, yearId: yearId});
   };
+
   const reloadData = scrollToTop => {
     queryDiaryListsById(yearId)
       .then(data => {
@@ -91,7 +74,7 @@ const DiaryList = ({navigation, route}) => {
       });
   };
 
-  const sortByDate = () => {
+  const sortByDateHandler = () => {
     isDeleted.current = false;
     if (sortType.current === 'ascending') {
       sortType.current = 'descending';
@@ -106,7 +89,7 @@ const DiaryList = ({navigation, route}) => {
     }
   };
 
-  const Header = () => {
+  const renderHeader = () => {
     return (
       <View style={{padding: 20}}>
         <View style={{display: 'flex', flexDirection: 'row'}}>
@@ -156,7 +139,7 @@ const DiaryList = ({navigation, route}) => {
           <Text style={{...FONTS.h3, marginTop: 10}}>
             What happended today?
           </Text>
-          <TouchableOpacity onPress={sortByDate}>
+          <TouchableOpacity onPress={sortByDateHandler}>
             <View
               style={{
                 width: 30,
@@ -171,137 +154,117 @@ const DiaryList = ({navigation, route}) => {
       </View>
     );
   };
-  useEffect(() => {
-    isDeleted.current = false;
-    reloadData(false);
-    Keyboard.dismiss();
-  }, []);
-  useEffect(() => {
-    if (firstAdd) {
-      firstAdd = false;
-      return;
-    }
-    isDeleted.current = false;
-    reloadData(true);
-    Keyboard.dismiss();
-  }, [newDiaryAdded]);
-  useEffect(() => {
-    if (firstUpdate) {
-      firstUpdate = false;
-      return;
-    }
-    isDeleted.current = false;
-    reloadData(false);
-    Keyboard.dismiss();
-  }, [detailChanged]);
-  useEffect(() => {
-    if (firstDelete) {
-      firstDelete = false;
-      return;
-    }
-    isDeleted.current = false;
-    reloadData(false);
-    Keyboard.dismiss();
-  }, [diaryDeleted]);
 
-  return (
-    <View style={styles.container}>
-      {Header()}
-      {/* <Button title="add new year" onPress={addNewDiary} /> */}
-
-      {diaryList.length > 0 && !isDeleted.current ? (
-        <FlatList
-          style={styles.flatList}
-          ref={flatListRef}
-          data={diaryList}
-          contentContainerStyle={{alignItems: 'center'}}
-          scrollEventThrottle={16}
-          decelerationRate={0}
-          bounces={false}
-          renderItem={({item, index}) => {
-            return (
+  const renderDiaryList = () => {
+    const renderItem = ({item, index}) => {
+      const longDate =
+        item.createdTs.toString().split(' ')[0] +
+        ' ' +
+        item.createdTs.toString().split(' ')[1] +
+        ' ' +
+        item.createdTs.toString().split(' ')[2];
+      const time = item.createdTs.toString().split(' ')[4];
+      return (
+        <View
+          style={{
+            width: PLACE_ITEM_SIZE,
+            marginTop: 10,
+            height: 80,
+            alignItems: 'center',
+          }}>
+          <TouchableWithoutFeedback onPress={() => singleDiaryHandler(item.id)}>
+            <View>
               <View
                 style={{
-                  width: PLACE_ITEM_SIZE,
-                  marginTop: 10,
-                  height: 80,
-                  alignItems: 'center',
+                  backgroundColor: 'red',
+                  height: '100%',
+                  borderRadius: 10,
+                  padding: 10,
+                  width: PLACE_ITEM_SIZE - 2,
                 }}>
-                <TouchableWithoutFeedback onPress={() => SingleDiary(item.id)}>
-                  <View>
-                    <View
-                      style={{
-                        backgroundColor: 'red',
-                        height: '100%',
-                        borderRadius: 10,
-                        padding: 10,
-                        width: PLACE_ITEM_SIZE - 2,
-                      }}>
-                      <Text style={{...FONTS.body3,color: COLORS.white, fontWeight: 'bold'}}>
-                        {item.title}
-                      </Text>
-                      <View style={{display: 'flex', flex: 1}} />
-                      <View
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                        }}>
-                        <Text style={{color: COLORS.white, fontWeight: 'bold'}}>
-                          {item.createdTs.toString().split(' ')[0] +
-                            ' ' +
-                            item.createdTs.toString().split(' ')[1] +
-                            ' ' +
-                            item.createdTs.toString().split(' ')[2]}
-                        </Text>
-                        <Text style={{color: COLORS.white, fontWeight: 'bold'}}>
-                          {item.createdTs.toString().split(' ')[4]}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                </TouchableWithoutFeedback>
+                <Text
+                  style={{
+                    ...FONTS.body3,
+                    color: COLORS.white,
+                    fontWeight: 'bold',
+                  }}>
+                  {item.title}
+                </Text>
+                <View style={{display: 'flex', flex: 1}} />
+                <View
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                  }}>
+                  <Text style={{color: COLORS.white, fontWeight: 'bold'}}>
+                    {date}
+                  </Text>
+                  <Text style={{color: COLORS.white, fontWeight: 'bold'}}>
+                    {time}
+                  </Text>
+                </View>
               </View>
-            );
-          }}
-          keyExtractor={item => item.id}
-        />
-      ) : isEmptyList.current == true ? (
-        <TouchableWithoutFeedback onPress={addNewDiary}>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      );
+    };
+
+    return (
+      <FlatList
+        ref={flatListRef}
+        data={diaryList}
+        contentContainerStyle={{alignItems: 'center'}}
+        scrollEventThrottle={16}
+        decelerationRate={0}
+        bounces={false}
+        renderItem={renderItem}
+        keyExtractor={item => `${item.id}`}
+      />
+    );
+  };
+
+  const renderDiaryAddButtonIfEmptyDiaryList = () => {
+    return (
+      <TouchableWithoutFeedback onPress={addNewDiaryHandler}>
+        <View
+          style={{
+            display: 'flex',
+            flex: 1,
+            marginBottom: '10%',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
           <View
             style={{
+              position: 'absolute',
+              left: '10%',
+              right: '10%',
+              top: '5%',
+              bottom: '5%',
+              backgroundColor: '#4079Ca',
+              borderRadius: 30,
               display: 'flex',
-              flex: 1,
-              marginBottom: '10%',
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <View
-              style={{
-                position: 'absolute',
-                left: '10%',
-                right: '10%',
-                top: '5%',
-                bottom: '5%',
-                backgroundColor: '#4079Ca',
-                borderRadius: 30,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <Image
-                source={icons.logo}
-                style={{width: 120 / 1.3, height: 120}}
-              />
-              <Text style={{...FONTS.body2, color: 'white', marginTop: 50}}>
-                ADD TODAY'S STORY
-              </Text>
-            </View>
+            <Image
+              source={icons.logo}
+              style={{width: 120 / 1.3, height: 120}}
+            />
+            <Text style={{...FONTS.body2, color: 'white', marginTop: 50}}>
+              ADD TODAY'S STORY
+            </Text>
           </View>
-        </TouchableWithoutFeedback>
-      ) : null}
-      <View style={{height: 55}} />
-      <TouchableWithoutFeedback onPress={addNewDiary}>
+        </View>
+      </TouchableWithoutFeedback>
+    );
+  };
+
+  const renderAddStoryButton = () => {
+    return (
+      <TouchableWithoutFeedback onPress={addNewDiaryHandler}>
         <View
           style={{
             position: 'absolute',
@@ -320,6 +283,58 @@ const DiaryList = ({navigation, route}) => {
           </Text>
         </View>
       </TouchableWithoutFeedback>
+    );
+  };
+
+  useEffect(() => {
+    isDeleted.current = false;
+    reloadData(false);
+    Keyboard.dismiss();
+  }, []);
+
+  useEffect(() => {
+    if (firstAdd) {
+      firstAdd = false;
+      return;
+    }
+    isDeleted.current = false;
+    reloadData(true);
+    Keyboard.dismiss();
+  }, [newDiaryAdded]);
+
+  useEffect(() => {
+    if (firstUpdate) {
+      firstUpdate = false;
+      return;
+    }
+    isDeleted.current = false;
+    reloadData(false);
+    Keyboard.dismiss();
+  }, [detailChanged]);
+
+  useEffect(() => {
+    if (firstDelete) {
+      firstDelete = false;
+      return;
+    }
+    isDeleted.current = false;
+    reloadData(false);
+    Keyboard.dismiss();
+  }, [diaryDeleted]);
+
+  return (
+    <View style={styles.container}>
+      {renderHeader()}
+
+      {diaryList.length > 0 && !isDeleted.current
+        ? renderDiaryList()
+        : isEmptyList.current == true
+        ? renderDiaryAddButtonIfEmptyDiaryList()
+        : null}
+
+      <View style={{height: 55}} />
+
+      {renderAddStoryButton()}
     </View>
   );
 };
@@ -330,11 +345,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'flex-start',
     backgroundColor: COLORS.lightYellow,
-  },
-  flatList: {
-    // flex: 1,
-    // flexDirection: 'column',
-    // backgroundColor: 'red',
   },
 });
 
