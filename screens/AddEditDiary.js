@@ -1,10 +1,8 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useRef} from 'react';
 import {
-  ScrollView,
   View,
   Text,
   StyleSheet,
-  Button,
   TextInput,
   Image,
   TouchableOpacity,
@@ -18,11 +16,10 @@ import {
 
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-import {useDispatch, useSelector} from 'react-redux';
+import {useDispatch} from 'react-redux';
 import {changedDatabaseAction} from '../store/databaseChanges';
 
-import realm from '../database/allSchemas';
-import {COLORS, FONTS, SIZES, icons, theme} from '../constants';
+import {COLORS, FONTS, SIZES, icons} from '../constants';
 
 const AddEditDiary = ({navigation, route}) => {
   const yearId = route.params.yearId;
@@ -47,7 +44,7 @@ const AddEditDiary = ({navigation, route}) => {
   const [datePickerDate, setDatePickerDate] = useState(
     p_date != undefined && p_date != ''
       ? p_date
-      : (yearId == undefined || yearId=="")
+      : yearId == undefined || yearId == ''
       ? new Date()
       : yearId !== new Date().toString().split(' ')[3].toString()
       ? ''
@@ -55,19 +52,18 @@ const AddEditDiary = ({navigation, route}) => {
   );
   const newYearAdded = useRef(false);
 
-  const showDatePicker = () => {
+  const showDatePickerHandler = () => {
     setDatePickerVisibility(true);
   };
 
-  const hideDatePicker = () => {
+  const hideDatePickerHandler = () => {
     setDatePickerVisibility(false);
   };
 
-  const handleConfirm = date => {
-    // console.warn('A date has been picked: ', date);
+  const confirmHandler = date => {
     if (dateError) setDateError(false);
     setDatePickerDate(date);
-    hideDatePicker();
+    hideDatePickerHandler();
   };
 
   const checkYearIsAdded = () => {
@@ -95,9 +91,7 @@ const AddEditDiary = ({navigation, route}) => {
     if (id != '' && id != undefined) {
       updateDiary();
     } else {
-      // var today = new Date();
       var today = datePickerDate.toString().split(' ')[3];
-      // const year = yearId == '' ? today.getFullYear() : yearId;
       const year = yearId == '' ? today : yearId;
       checkYearValidation(year.toString())
         .then(data => {
@@ -105,7 +99,7 @@ const AddEditDiary = ({navigation, route}) => {
             // year-found
             addNewDiary(data[0].id);
           } else {
-            //year-is-empty
+            //year-is-empty then add new row to DiaryListSchema in db
             newYearAdded.current = true;
             addNewDiaryList();
           }
@@ -120,9 +114,7 @@ const AddEditDiary = ({navigation, route}) => {
   const addNewDiaryList = () => {
     let newId = Math.floor(Date.now() / 1000);
 
-    // var today = new Date();
     var selectedDate = datePickerDate.toString().split(' ')[3];
-    // const year = yearId == '' ? today.getFullYear() : yearId;
     const year = yearId == '' ? selectedDate : yearId;
 
     const newDiaryContent = {
@@ -133,15 +125,6 @@ const AddEditDiary = ({navigation, route}) => {
       createdTs: datePickerDate,
       updatedTs: datePickerDate,
     };
-
-    // const newDiaryContent = {
-    //   id: `diary-${newId}`,
-    //   title: `diary no ${newId}`,
-    //   year: year.toString(),
-    //   color: '#f0a0f0',
-    //   createdTs: new Date(),
-    //   updatedTs: new Date(),
-    // };
 
     insertDiaryList(newDiaryContent)
       .then(data => {
@@ -156,11 +139,6 @@ const AddEditDiary = ({navigation, route}) => {
   const addNewDiary = id => {
     let newId = Math.floor(Date.now() / 1000);
 
-    // let today = new Date();
-    var selectedDate = datePickerDate.toString().split(' ')[3];
-    const month = parseInt(datePickerDate.getMonth() + 1);
-    const day = datePickerDate.getDate();
-    const year = datePickerDate.getFullYear();
     let date =
       datePickerDate.getDate() +
       '/' +
@@ -220,19 +198,69 @@ const AddEditDiary = ({navigation, route}) => {
       });
   };
 
-  const reloadData = () => {
-    queryAllDiaryLists()
-      .then(data => {
-        setDiaryList(data);
-      })
-      .catch(error => {
-        console.log('error-reload');
-        console.log(error);
-        setDiaryList([]);
-      });
-  };
+  const renderHeader = () => {
+    const renderDatePicker = () => {
+      return (
+        <TouchableOpacity onPress={showDatePickerHandler}>
+          <View
+            style={{
+              height: 30,
+              justifyContent: 'center',
+              alignItems: 'center',
+              display: 'flex',
+              flexDirection: 'row',
+            }}>
+            <View
+              style={{
+                borderBottomColor: COLORS.black,
+                borderBottomWidth: 1,
+              }}>
+              <Text style={{...FONTS.h3, marginTop: 10}}>publish date:</Text>
+            </View>
+            <View
+              style={{
+                borderBottomColor:
+                  dateError == null
+                    ? COLORS.black
+                    : dateError
+                    ? COLORS.red
+                    : COLORS.black,
+                borderBottomWidth: 1,
+                marginLeft: 5,
+              }}>
+              <Text
+                style={{
+                  ...FONTS.h3,
+                  marginTop: 10,
+                  color:
+                    dateError == null
+                      ? COLORS.black
+                      : dateError
+                      ? COLORS.red
+                      : COLORS.black,
+                }}>
+                {' '}
+                {datePickerDate.toString() == '' && dateError == null
+                  ? 'Add Date'
+                  : dateError
+                  ? 'Add Date'
+                  : datePickerDate.toString().split(' ')[1] +
+                    ' ' +
+                    datePickerDate.toString().split(' ')[2] +
+                    ' ' +
+                    datePickerDate.toString().split(' ')[3]}
+              </Text>
+            </View>
 
-  const Header = () => {
+            <Image
+              style={{width: 15, height: 15, marginLeft: 5}}
+              source={icons.edit_icon}
+            />
+          </View>
+        </TouchableOpacity>
+      );
+    };
+
     return (
       <View>
         <View
@@ -245,63 +273,7 @@ const AddEditDiary = ({navigation, route}) => {
             style={{width: 50 / 1.3, height: 50, marginRight: 5}}
             source={icons.logo}
           />
-          <TouchableOpacity onPress={showDatePicker}>
-            <View
-              style={{
-                height: 30,
-                justifyContent: 'center',
-                alignItems: 'center',
-                display: 'flex',
-                flexDirection: 'row',
-              }}>
-              <View
-                style={{
-                  borderBottomColor: COLORS.black,
-                  borderBottomWidth: 1,
-                }}>
-                <Text style={{...FONTS.h3, marginTop: 10}}>publish date:</Text>
-              </View>
-              <View
-                style={{
-                  borderBottomColor:
-                    dateError == null
-                      ? COLORS.black
-                      : dateError
-                      ? COLORS.red
-                      : COLORS.black,
-                  borderBottomWidth: 1,
-                  marginLeft: 5,
-                }}>
-                <Text
-                  style={{
-                    ...FONTS.h3,
-                    marginTop: 10,
-                    color:
-                      dateError == null
-                        ? COLORS.black
-                        : dateError
-                        ? COLORS.red
-                        : COLORS.black,
-                  }}>
-                  {' '}
-                  {datePickerDate.toString() == '' && dateError == null
-                    ? 'Add Date'
-                    : dateError
-                    ? 'Add Date'
-                    : datePickerDate.toString().split(' ')[1] +
-                      ' ' +
-                      datePickerDate.toString().split(' ')[2] +
-                      ' ' +
-                      datePickerDate.toString().split(' ')[3]}
-                </Text>
-              </View>
-
-              <Image
-                style={{width: 15, height: 15, marginLeft: 5}}
-                source={icons.edit_icon}
-              />
-            </View>
-          </TouchableOpacity>
+          {renderDatePicker()}
         </View>
 
         <Text style={{...FONTS.h3, marginTop: 10}}>What happended today?</Text>
@@ -309,8 +281,8 @@ const AddEditDiary = ({navigation, route}) => {
           <DateTimePickerModal
             isVisible={isDatePickerVisible}
             mode="date"
-            onConfirm={handleConfirm}
-            onCancel={hideDatePicker}
+            onConfirm={confirmHandler}
+            onCancel={hideDatePickerHandler}
             maximumDate={
               yearId != undefined && yearId != ''
                 ? new Date(+yearId + 1, 0, 0)
@@ -327,69 +299,8 @@ const AddEditDiary = ({navigation, route}) => {
     );
   };
 
-  const footer = () => {
+  const renderTitle = () => {
     return (
-      <View
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          right: 0,
-          left: 0,
-        }}>
-        <View
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            right: 0,
-          }}>
-          <TouchableOpacity onPress={checkYearIsAdded}>
-            <View
-              style={{
-                backgroundColor: COLORS.darkBlue,
-                width: 80,
-                height: 50,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderTopLeftRadius: 25,
-              }}>
-              <Text style={{color: 'white', ...FONTS.h3, textAlign: 'center'}}>
-                {id != '' && id != undefined ? 'edit' : 'save'}
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-        <View
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-          }}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
-            <View
-              style={{
-                backgroundColor: COLORS.red,
-                width: 80,
-                height: 50,
-                justifyContent: 'center',
-                alignItems: 'center',
-                borderTopRightRadius: 25,
-              }}>
-              <Text style={{color: 'white', ...FONTS.h3, textAlign: 'center'}}>
-                cancel
-              </Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
-  };
-
-  return (
-    <View style={styles.container}>
-      {/* header */}
-      {Header()}
-
-      {/* title */}
       <View>
         <TextInput
           style={{
@@ -416,12 +327,14 @@ const AddEditDiary = ({navigation, route}) => {
           </Text>
         ) : null}
       </View>
+    );
+  };
 
-      {/* content */}
+  const renderContent = () => {
+    return (
       <View style={{flex: 1, marginBottom: 25}}>
         <TextInput
           multiline={true}
-          // numberOfLines={10}
           style={[
             styles.inputs,
             {
@@ -450,9 +363,91 @@ const AddEditDiary = ({navigation, route}) => {
           </Text>
         ) : null}
       </View>
+    );
+  };
+
+  const renderFooter = () => {
+    const renderSaveEditButton = () => {
+      return (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            right: 0,
+          }}>
+          <TouchableOpacity onPress={checkYearIsAdded}>
+            <View
+              style={{
+                backgroundColor: COLORS.darkBlue,
+                width: 80,
+                height: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderTopLeftRadius: 25,
+              }}>
+              <Text style={{color: 'white', ...FONTS.h3, textAlign: 'center'}}>
+                {id != '' && id != undefined ? 'edit' : 'save'}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      );
+    };
+
+    const renderCancelButton = () => {
+      return (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+          }}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <View
+              style={{
+                backgroundColor: COLORS.red,
+                width: 80,
+                height: 50,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderTopRightRadius: 25,
+              }}>
+              <Text style={{color: 'white', ...FONTS.h3, textAlign: 'center'}}>
+                cancel
+              </Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+      );
+    };
+
+    return (
+      <View
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          left: 0,
+        }}>
+        {renderSaveEditButton()}
+        {renderCancelButton()}
+      </View>
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      {/* header */}
+      {renderHeader()}
+
+      {/* title */}
+      {renderTitle()}
+
+      {/* content */}
+      {renderContent()}
 
       {/* footer */}
-      {footer()}
+      {renderFooter()}
     </View>
   );
 };
