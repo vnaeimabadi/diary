@@ -1,15 +1,15 @@
 ## for create react-native app:
 
-   npx react-native init Project-Name
+  * npx react-native init Project-Name
 
 ## Now go into the project folder.
-   cd Project
+  * cd Project
 
 ## You can now run and build the app for your own operating system with the following command:
 
-   npx react-native run-android
+  * npx react-native run-android 
 
-   npx react-native run-ios
+  * npx react-native run-ios
 
 
 -----------------------------
@@ -22,4 +22,4 @@
 
 ## command link:
 
-### npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+* npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
