@@ -463,9 +463,7 @@ const styles = StyleSheet.create({
   inputs: {
     minHeight: 40,
     marginLeft: 16,
-    // paddingTop: 10,
     overflow: 'hidden',
-    // padding: 10,
     paddingRight: 25,
     borderBottomColor: '#000000',
     flex: 1,
