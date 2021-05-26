@@ -161,26 +161,62 @@ const Login = ({navigation}) => {
     }
   };
 
-  // const removeCredentials = async () => {
-  //   try {
-  //     const credentials = await Keychain.resetGenericPassword();
-  //     console.log(JSON.parse(credentials));
-  //     setResult(JSON.parse(credentials));
-  //   } catch (error) {
-  //     console.log("Keychain couldn't be accessed!", error);
-  //   }
-  // };
+  const removeCredentials = async () => {
+    try {
+      const credentials = await Keychain.resetGenericPassword();
+      console.log(JSON.parse(credentials));
+      setResult(JSON.parse(credentials));
+    } catch (error) {
+      console.log("Keychain couldn't be accessed!", error);
+    }
+  };
 
+  const renderMainContent = (title, isRegister = false) => {
+    const renderLoginButton = () => {
+      return (
+        <TouchableOpacity onPress={checkUserStatus}>
+          <View
+            style={{
+              backgroundColor: COLORS.darkBlue,
+              height: 36,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            {loading ? (
+              <ActivityIndicator size="small" color={COLORS.white} />
+            ) : (
+              <Text style={{color: COLORS.white}}>Login</Text>
+            )}
+          </View>
+        </TouchableOpacity>
+      );
+    };
 
-  useEffect(() => {
-    checkLoginStatus();
-  }, []);
+    const renderRegisterButton = () => {
+      return (
+        <TouchableOpacity onPress={registerHandler}>
+          <View
+            style={{
+              backgroundColor: COLORS.darkBlue,
+              height: 36,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            {loading ? (
+              <ActivityIndicator size="small" color={COLORS.white} />
+            ) : (
+              <Text style={{color: COLORS.white}}>Register</Text>
+            )}
+          </View>
+        </TouchableOpacity>
+      );
+    };
 
-  return (
-    <ScrollView style={{padding: 20}}>
-      {firstTime == null ? null : firstTime == true ? (
+    const renderName = () => {
+      return isRegister ? (
         <View>
-          <Text style={{fontSize: 27}}>Register</Text>
           <TextInput
             style={{
               borderBottomColor: nameError ? COLORS.red : COLORS.darkBlue,
@@ -198,47 +234,13 @@ const Login = ({navigation}) => {
               please enter name
             </Text>
           ) : null}
-          <TextInput
-            style={{
-              marginTop: 20,
-              borderBottomColor: passwordError ? COLORS.red : COLORS.darkBlue,
-              borderBottomWidth: 1,
-              height: 40,
-              color: COLORS.black,
-              ...FONTS.body3,
-            }}
-            secureTextEntry={true}
-            placeholder="Password"
-            value={password}
-            onChangeText={value => updatePassword(value)}
-          />
-          {passwordError ? (
-            <Text style={{marginLeft: 0, color: COLORS.red}}>
-              please enter password
-            </Text>
-          ) : null}
-          <View style={{margin: 7}} />
-          <TouchableOpacity onPress={registerHandler}>
-            <View
-              style={{
-                backgroundColor: COLORS.darkBlue,
-                height: 36,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              {loading ? (
-                <ActivityIndicator size="small" color={COLORS.white} />
-              ) : (
-                <Text style={{color: COLORS.white}}>Register</Text>
-              )}
-            </View>
-          </TouchableOpacity>
         </View>
-      ) : (
-        <View>
-          <Text style={{fontSize: 27}}>Login</Text>
+      ) : null;
+    };
 
+    const renderPassword = () => {
+      return (
+        <View>
           <TextInput
             style={{
               marginTop: 20,
@@ -258,26 +260,51 @@ const Login = ({navigation}) => {
               please enter password
             </Text>
           ) : null}
-          <View style={{margin: 7}} />
-          <TouchableOpacity onPress={checkUserStatus}>
-            <View
-              style={{
-                backgroundColor: COLORS.darkBlue,
-                height: 36,
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              {loading ? (
-                <ActivityIndicator size="small" color={COLORS.white} />
-              ) : (
-                <Text style={{color: COLORS.white}}>Login</Text>
-              )}
-            </View>
-          </TouchableOpacity>
         </View>
-      )}
-    </ScrollView>
+      );
+    };
+
+    return (
+      <View
+        style={{
+          display: 'flex',
+          justifyContent:"center",
+          width: '100%',
+        }}>
+        <ScrollView
+          contentContainerStyle={{
+            padding: 12,
+            justifyContent: 'center',
+          }}>
+          <Text style={{fontSize: 27}}>{title}</Text>
+          {renderName()}
+          {renderPassword()}
+          <View style={{margin: 7}} />
+          {isRegister ? renderRegisterButton() : renderLoginButton()}
+        </ScrollView>
+      </View>
+    );
+  };
+
+  useEffect(() => {
+    checkLoginStatus();
+  }, []);
+
+  return (
+    <View
+      style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        flex: 1,
+        width: '100%',
+      }}>
+      {firstTime == null
+        ? null
+        : firstTime == true
+        ? renderMainContent('Register', true)
+        : renderMainContent('Login')}
+    </View>
   );
 };
 
