@@ -198,7 +198,7 @@ const DiaryList = ({navigation, route}) => {
                     justifyContent: 'space-between',
                   }}>
                   <Text style={{color: COLORS.white, fontWeight: 'bold'}}>
-                    {date}
+                    {longDate}
                   </Text>
                   <Text style={{color: COLORS.white, fontWeight: 'bold'}}>
                     {time}
