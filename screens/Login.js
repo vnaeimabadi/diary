@@ -19,14 +19,13 @@ import jwt from 'react-native-pure-jwt';
 
 const Login = ({navigation}) => {
   const dispatch = useDispatch();
+  const userName = useSelector(status => status.userName);
 
   const [loading, setLoading] = useState(false);
-  const [jwtToken, setJwtToken] = useState('');
-  const [name, setName] = useState('');
+  const [name, setName] = useState(userName);
   const [nameError, setNameError] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState(false);
-  const [result, setResult] = useState('');
   const [firstTime, setFirstTime] = useState(null);
 
   const updateName = value => {
@@ -97,12 +96,6 @@ const Login = ({navigation}) => {
 
       setLoading(true);
       const credentials = await Keychain.getGenericPassword();
-
-      // console.log(credentials.password);
-      //   console.log(JSON.parse(credentials));
-      //   setResult(JSON.parse(credentials))
-      //   var decoded = jwt.verify(jwtToken, password);
-      //   console.log(decoded.password);
       jwt
         .sign(
           {
@@ -125,29 +118,15 @@ const Login = ({navigation}) => {
         .catch(err => {
           setLoading(false);
         });
-
-      // jwt
-      //   .decode(
-      //     jwtToken, // the token
-      //     password, // the secret
-      //     {
-      //       skipValidation: true, // to skip signature and exp verification
-      //     },
-      //   )
-      //   .then(console.log) // already an object. read below, exp key note
-      //   .catch(console.error);
     } catch (error) {
       setLoading(false);
       Alert.alert(`You don't have access!`, '', [{text: 'ok'}]);
-      // console.log("Keychain couldn't be accessed!", error);
-      setResult(error);
     }
   };
 
   const checkLoginStatus = async () => {
     try {
       const credentials = await Keychain.getGenericPassword();
-      // console.log(credentials.password);
       // removeCredentials()
       if (credentials.password == undefined) {
         setFirstTime(true);
@@ -156,8 +135,6 @@ const Login = ({navigation}) => {
       }
     } catch (error) {
       Alert.alert(`You don't have access!`, '', [{text: 'ok'}]);
-      // console.log("Keychain couldn't be accessed!", error);
-      setResult(error);
     }
   };
 
@@ -165,7 +142,6 @@ const Login = ({navigation}) => {
     try {
       const credentials = await Keychain.resetGenericPassword();
       console.log(JSON.parse(credentials));
-      setResult(JSON.parse(credentials));
     } catch (error) {
       console.log("Keychain couldn't be accessed!", error);
     }
@@ -177,8 +153,7 @@ const Login = ({navigation}) => {
         <TouchableOpacity onPress={checkUserStatus}>
           <View
             style={{
-              backgroundColor: COLORS.darkBlue,
-              height: 36,
+              height: '100%',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
@@ -198,8 +173,7 @@ const Login = ({navigation}) => {
         <TouchableOpacity onPress={registerHandler}>
           <View
             style={{
-              backgroundColor: COLORS.darkBlue,
-              height: 36,
+              height: '100%',
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
@@ -215,9 +189,10 @@ const Login = ({navigation}) => {
     };
 
     const renderName = () => {
-      return isRegister ? (
+      return (
         <View>
           <TextInput
+            editable={isRegister ? true : false}
             style={{
               borderBottomColor: nameError ? COLORS.red : COLORS.darkBlue,
               borderBottomWidth: 1,
@@ -225,6 +200,7 @@ const Login = ({navigation}) => {
               color: COLORS.black,
               ...FONTS.body3,
             }}
+            // secureTextEntry={isRegister ? false : true}
             placeholder="Name"
             value={name}
             onChangeText={value => updateName(value)}
@@ -235,7 +211,7 @@ const Login = ({navigation}) => {
             </Text>
           ) : null}
         </View>
-      ) : null;
+      ) ;
     };
 
     const renderPassword = () => {
@@ -264,23 +240,90 @@ const Login = ({navigation}) => {
       );
     };
 
+    const renderLeftSideBox = () => {
+      return (
+        <View
+          style={{
+            width: '50%',
+            height: SIZES.height / 1.8,
+            backgroundColor: COLORS.darkBlue,
+            borderTopRightRadius: 15,
+            borderBottomRightRadius: 15,
+            elevation: 5,
+          }}
+        />
+      );
+    };
+
+    const renderTitle = title => {
+      return (
+        <View
+          style={{position: 'absolute', elevation: 5, top: 16, left: '20%'}}>
+          <Text style={{color: COLORS.lightYellow, ...FONTS.h2}}>{title}</Text>
+        </View>
+      );
+    };
+
+    const renderContent = () => {
+      return (
+        <View
+          style={{
+            position: 'absolute',
+            width: '75%',
+            height: 200,
+            backgroundColor: COLORS.white,
+            left: '15%',
+            borderRadius: 15,
+            elevation: 5,
+            padding: 20,
+            justifyContent: 'center',
+          }}>
+          {renderName()}
+          {renderPassword()}
+        </View>
+      );
+    };
+
+    const renderButton = () => {
+      return (
+        <View
+          style={{
+            position: 'absolute',
+            width: '35%',
+            height: 46,
+            backgroundColor: COLORS.blue,
+            left: '35%',
+            bottom: '15%',
+            borderRadius: 5,
+            elevation: 5,
+          }}>
+          {isRegister ? renderRegisterButton() : renderLoginButton()}
+        </View>
+      );
+    };
+
     return (
       <View
         style={{
           display: 'flex',
-          justifyContent:"center",
+          justifyContent: 'center',
           width: '100%',
         }}>
         <ScrollView
           contentContainerStyle={{
-            padding: 12,
+            // padding: 12,
             justifyContent: 'center',
           }}>
-          <Text style={{fontSize: 27}}>{title}</Text>
+          {/* <Text style={{fontSize: 27}}>{title}</Text>
           {renderName()}
           {renderPassword()}
           <View style={{margin: 7}} />
-          {isRegister ? renderRegisterButton() : renderLoginButton()}
+          {isRegister ? renderRegisterButton() : renderLoginButton()} */}
+
+          {renderLeftSideBox()}
+          {renderTitle(title)}
+          {renderContent()}
+          {renderButton()}
         </ScrollView>
       </View>
     );
