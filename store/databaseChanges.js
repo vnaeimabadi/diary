@@ -6,7 +6,7 @@ const initialState = {
   singleDiaryEdited: false,
   diaryYear: false,
   diaryYearDeleted: false,
-  userName: 'Guest',
+  userName: '',
 };
 
 const changeSlice = createSlice({
