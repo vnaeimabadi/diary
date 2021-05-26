@@ -11,7 +11,8 @@
 
   * npx react-native run-ios
 
-
+## after adding fonts to assets you have to do the following command:
+  * npx react-native link
 -----------------------------
 
 ## unable to load script. make sure you're either running a metro server (run 'react-native start')
