@@ -137,6 +137,7 @@ const AddEditDiary = ({navigation, route}) => {
       color: '#f0a0f0',
       createdTs: datePickerDate,
       updatedTs: datePickerDate,
+      image:""
     };
 
     insertDiaryList(newDiaryContent)

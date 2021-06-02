@@ -174,20 +174,7 @@ const DiaryYearList = ({navigation}) => {
                       Diary Book
                     </Text>
                   </View>
-
-                  {/* {item.diaries.map((diaryItem, index) => {
-                    // console.log(diaryItem.title);
-                    return (
-                      <ScrollView>
-                        <View>
-                          <Text style={{...FONTS.body4, color: COLORS.white}}>
-                            {diaryItem.title}
-                          </Text>
-                        </View>
-                      </ScrollView>
-                    );
-                  })} */}
-
+                  
                   <View
                     style={{
                       backgroundColor: COLORS.blue,

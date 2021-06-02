@@ -31,6 +31,7 @@ export const DiaryListSchema = {
     year: 'string',
     createdTs: 'date',
     diaries: {type: 'list', objectType: DIARY_SCHEMA},
+    image: 'string',
   },
 };
 export const ImageSchema = {
@@ -82,6 +83,23 @@ export const updateDiaryList = (id, data, index) =>
       .catch(error => reject(error));
   });
 
+export const updateDiaryYearImage = (id, data) =>
+  new Promise((resolve, reject) => {
+    Realm.open(databaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          let filterYear = realm
+            .objects(DIARYLIST_SCHEMA)
+            .filtered('year == $0', id);
+
+          filterYear[0].image = data.images;
+
+          resolve(filterYear);
+        });
+      })
+      .catch(error => reject(error));
+  });
+
 export const queryAllDiaryLists = () =>
   new Promise((resolve, reject) => {
     Realm.open(databaseOptions)
@@ -114,14 +132,14 @@ export const deleteSingleDiary = (year, singleDiaryIndex) =>
           let allDiaryList = realm
             .objects(DIARYLIST_SCHEMA)
             .filtered('year == $0', year);
-            
+
           realm.delete(allDiaryList[0].diaries[singleDiaryIndex]);
           // allDiaryList[0].diaries.forEach((realmObj, index) => {
           // if (singleDiaryIndex.toString() === index.toString()) {
           //   realm.delete(realmObj);
           // }
           // });
-          
+
           resolve();
         });
       })
