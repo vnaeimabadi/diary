@@ -6,6 +6,8 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  FlatList,
+  Alert,
 } from 'react-native';
 import {
   insertDiaryList,
@@ -14,12 +16,15 @@ import {
   updateDiaryList,
 } from '../database/allSchemas';
 
+import uuid from 'react-native-uuid';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import ImagePicker from 'react-native-image-crop-picker';
 
 import {useDispatch} from 'react-redux';
 import {changedDatabaseAction} from '../store/databaseChanges';
 
 import {COLORS, FONTS, SIZES, icons} from '../constants';
+import {Colors} from 'react-native/Libraries/NewAppScreen';
 
 const AddEditDiary = ({navigation, route}) => {
   const yearId = route.params.yearId;
@@ -29,6 +34,12 @@ const AddEditDiary = ({navigation, route}) => {
   const selectedIndex = route.params.selectedIndex;
   const editedTitle = route.params.title;
   const editedContent = route.params.content;
+  const all_images = route.params.images;
+
+  const [images, setImages] = useState(
+    all_images == undefined || all_images == null ? [] : JSON.parse(all_images),
+    // []
+  );
 
   const dispatch = useDispatch();
 
@@ -38,6 +49,8 @@ const AddEditDiary = ({navigation, route}) => {
   const [detailsError, setDetailsError] = useState(false);
   const [dateError, setDateError] = useState(null);
   const [height, setHeight] = useState(0);
+
+  const [visibleImagePicker, setVisibleImagePicker] = useState(false);
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
 
@@ -146,6 +159,18 @@ const AddEditDiary = ({navigation, route}) => {
       '/' +
       datePickerDate.getFullYear();
 
+    let addImages = [];
+
+    if (images.length > 0) {
+      addImages = images.map((item, index) => {
+        return {
+          id: item.id,
+          path: item.uri,
+          createdTs: datePickerDate,
+        };
+      });
+    }
+
     const newDiaryContent = {
       id: `diary-${newId}`,
       title: title,
@@ -157,6 +182,7 @@ const AddEditDiary = ({navigation, route}) => {
       lat: '',
       long: '',
       location: '',
+      images: addImages,
     };
 
     insertDiaryToDiaryList(id, newDiaryContent)
@@ -174,6 +200,18 @@ const AddEditDiary = ({navigation, route}) => {
   };
 
   const updateDiary = () => {
+    let addImages = [];
+
+    if (images.length > 0) {
+      addImages = images.map((item, index) => {
+        return {
+          id: item.id,
+          path: item.uri,
+          createdTs: datePickerDate,
+        };
+      });
+    }
+
     const updateDiaryContent = {
       id: `diary`,
       title: title,
@@ -185,6 +223,7 @@ const AddEditDiary = ({navigation, route}) => {
       lat: '',
       long: '',
       location: '',
+      images: addImages,
     };
 
     updateDiaryList(yearId, updateDiaryContent, selectedIndex)
@@ -196,6 +235,143 @@ const AddEditDiary = ({navigation, route}) => {
         console.log('error-insert');
         console.log(error);
       });
+  };
+
+  const deleteImageDialogBox = id =>
+    Alert.alert('Delete Image', 'Are your sure you want to delete image?', [
+      {
+        text: 'Cancel',
+        style: 'cancel',
+      },
+      {text: 'delete', onPress: () => deleteImage(id)},
+    ]);
+
+  const deleteImage = id => {
+    let temp = images.filter((data, index) => {
+      return data.id != id;
+    });
+
+    setImages(temp);
+  };
+
+  const renderImagePicker = () => {
+    return (
+      <View
+        style={{
+          position: 'absolute',
+          zIndex: 100,
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: COLORS.gray,
+          opacity: 0.8,
+          justifyContent: 'flex-end',
+        }}>
+        <View
+          style={{
+            display: 'flex',
+            height: '25%',
+            backgroundColor: COLORS.darkBlue,
+            borderTopLeftRadius: 25,
+            borderTopRightRadius: 25,
+            opacity: 1,
+          }}>
+          <View
+            style={{
+              flex: 1,
+            }}>
+            <TouchableOpacity
+              onPress={() => {
+                ImagePicker.openCamera({
+                  multiple: false,
+                  cropping: true,
+                  waitAnimationEnd: false,
+                  includeExif: true,
+                  mediaType: 'photo',
+                  forceJpg: true,
+                })
+                  .then(i => {
+                    let temp = [...images];
+                    temp.push({
+                      id: uuid.v4(),
+                      uri: i.path,
+                      mime: i.mime,
+                    });
+                    setImages(temp);
+                    setVisibleImagePicker(false);
+                  })
+                  .catch(e => {});
+              }}
+              style={{
+                borderTopLeftRadius: 25,
+                justifyContent: 'center',
+                alignItems: 'center',
+                borderTopRightRadius: 25,
+                width: '100%',
+                height: '100%',
+              }}>
+              <Text style={{...FONTS.body3, color: COLORS.white}}>
+                select camera
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+            <TouchableOpacity
+              onPress={() => {
+                ImagePicker.openPicker({
+                  multiple: false,
+                  cropping: true,
+                  waitAnimationEnd: false,
+                  includeExif: true,
+                  mediaType: 'photo',
+                  forceJpg: true,
+                })
+                  .then(i => {
+                    let temp = [...images];
+                    temp.push({
+                      id: uuid.v4(),
+                      uri: i.path,
+                      mime: i.mime,
+                    });
+                    setImages(temp);
+                    setVisibleImagePicker(false);
+                  })
+                  .catch(e => {});
+              }}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                height: '100%',
+              }}>
+              <Text style={{...FONTS.body3, color: COLORS.white}}>
+                select gallery
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: COLORS.red,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              onPress={() => setVisibleImagePicker(false)}
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                height: '100%',
+              }}>
+              <Text style={{...FONTS.body3, color: COLORS.white}}>cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    );
   };
 
   const renderHeader = () => {
@@ -261,6 +437,29 @@ const AddEditDiary = ({navigation, route}) => {
       );
     };
 
+    const renderOpenPicker = () => {
+      return (
+        <TouchableOpacity
+          onPress={() => {
+            setVisibleImagePicker(true);
+          }}>
+          <View
+            style={{
+              height: 30,
+              justifyContent: 'center',
+              alignItems: 'center',
+              display: 'flex',
+              flexDirection: 'row',
+            }}>
+            <Image
+              style={{width: 25, height: 25, marginLeft: 10}}
+              source={icons.image_picker}
+            />
+          </View>
+        </TouchableOpacity>
+      );
+    };
+
     return (
       <View>
         <View
@@ -274,6 +473,7 @@ const AddEditDiary = ({navigation, route}) => {
             source={icons.logo}
           />
           {renderDatePicker()}
+          {renderOpenPicker()}
         </View>
 
         <Text style={{...FONTS.h3, marginTop: 10}}>What happended today?</Text>
@@ -304,7 +504,7 @@ const AddEditDiary = ({navigation, route}) => {
       <View>
         <TextInput
           style={{
-            marginVertical: SIZES.padding,
+            marginBottom: SIZES.padding,
             borderBottomColor: titleError ? COLORS.red : COLORS.darkBlue,
             borderBottomWidth: 1,
             height: 40,
@@ -326,6 +526,62 @@ const AddEditDiary = ({navigation, route}) => {
             please enter diary title
           </Text>
         ) : null}
+      </View>
+    );
+  };
+
+  const renderImages = () => {
+    const renderImageList = ({item, index}) => {
+      return (
+        <View
+          style={{
+            height: '100%',
+            width: 80,
+            borderRadius: 5,
+            marginHorizontal: 5,
+          }}>
+          <Image
+            style={{
+              width: 80,
+              height: '100%',
+              resizeMode: 'cover',
+              borderRadius: 5,
+            }}
+            source={item}
+          />
+          {/*diary delete button*/}
+          <View style={{position: 'absolute', top: 5, right: 5}}>
+            <TouchableOpacity onPress={() => deleteImageDialogBox(item.id)}>
+              <View
+                style={{
+                  height: 30,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Image
+                  style={{width: 15, height: 15 * 1.5, marginLeft: 5}}
+                  source={icons.delete_icon}
+                />
+              </View>
+            </TouchableOpacity>
+          </View>
+        </View>
+      );
+    };
+
+    return (
+      <View>
+        <FlatList
+          horizontal
+          style={{height: 80}}
+          contentContainerStyle={{
+            height: '100%',
+            alignSelf: 'center',
+          }}
+          data={images}
+          keyExtractor={item => `img-${item.id}`}
+          renderItem={renderImageList}
+        />
       </View>
     );
   };
@@ -440,6 +696,9 @@ const AddEditDiary = ({navigation, route}) => {
       {/* header */}
       {renderHeader()}
 
+      {/* images */}
+      {images.length > 0 ? renderImages() : null}
+
       {/* title */}
       {renderTitle()}
 
@@ -448,6 +707,9 @@ const AddEditDiary = ({navigation, route}) => {
 
       {/* footer */}
       {renderFooter()}
+
+      {/* image Picker */}
+      {visibleImagePicker ? renderImagePicker() : null}
     </View>
   );
 };

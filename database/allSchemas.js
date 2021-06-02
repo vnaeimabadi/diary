@@ -74,6 +74,7 @@ export const updateDiaryList = (id, data, index) =>
           filterYear[0].diaries[index].title = data.title;
           filterYear[0].diaries[index].content = data.content;
           filterYear[0].diaries[index].updatedTs = data.updatedTs;
+          filterYear[0].diaries[index].images = data.images;
 
           resolve(filterYear);
         });

@@ -6,6 +6,7 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
+  FlatList,
   Alert,
 } from 'react-native';
 import {queryDiaryListsById, deleteSingleDiary} from '../database/allSchemas';
@@ -26,6 +27,7 @@ const DiaryDetail = ({navigation, route}) => {
   const [title, setTitle] = useState('');
   const [details, setDetails] = useState('');
   const [date, setDate] = useState(null);
+  const [images, setImages] = useState([]);
 
   const reloadData = () => {
     queryDiaryListsById(yearId)
@@ -41,6 +43,8 @@ const DiaryDetail = ({navigation, route}) => {
         setTitle(dd[0].title);
         setDetails(dd[0].content);
         setDate(dd[0].createdTs);
+
+        setImages(dd[0].images);
       })
       .catch(error => {
         console.log('error-reload');
@@ -50,6 +54,12 @@ const DiaryDetail = ({navigation, route}) => {
   };
 
   const editDearyHandler = () => {
+    let temp = [];
+    if (images != null && images.length > 0) {
+      images.map((item, index) => {
+        temp.push({id: item.id, uri: item.path, mime: ''});
+      });
+    }
     navigation.navigate('AddEditDiary', {
       yearId: yearId,
       date: date.toString(),
@@ -57,6 +67,7 @@ const DiaryDetail = ({navigation, route}) => {
       title: title,
       content: details,
       selectedIndex: selectedIndex.current,
+      images: JSON.stringify(temp),
     });
   };
 
@@ -163,6 +174,46 @@ const DiaryDetail = ({navigation, route}) => {
     );
   };
 
+  const renderImages = () => {
+    const renderImageList = ({item, index}) => {
+      return (
+        <View
+          style={{
+            height: '100%',
+            width: 80,
+            borderRadius: 5,
+            marginHorizontal: 5,
+          }}>
+          <Image
+            style={{
+              width: 80,
+              height: '100%',
+              resizeMode: 'cover',
+              borderRadius: 5,
+            }}
+            source={{uri: item.path}}
+          />
+        </View>
+      );
+    };
+
+    return (
+      <View>
+        <FlatList
+          horizontal
+          style={{height: 100}}
+          contentContainerStyle={{
+            height: '80%',
+            alignSelf: 'center',
+          }}
+          data={images}
+          keyExtractor={item => `img-${item.id}`}
+          renderItem={renderImageList}
+        />
+      </View>
+    );
+  };
+
   const renderContent = () => {
     return (
       <ScrollView>
@@ -171,6 +222,7 @@ const DiaryDetail = ({navigation, route}) => {
             style={{
               color: COLORS.black,
               ...FONTS.body3,
+              paddingRight: 5,
             }}>
             {details}
           </Text>
@@ -186,6 +238,9 @@ const DiaryDetail = ({navigation, route}) => {
   return (
     <View style={styles.container}>
       {renderHeader()}
+
+      {/* images */}
+      {images.length > 0 ? renderImages() : null}
 
       {renderTitle()}
 

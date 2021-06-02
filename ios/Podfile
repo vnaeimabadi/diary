@@ -12,6 +12,10 @@ target 'diary' do
     :hermes_enabled => false
   )
 
+  pod 'react-native-image-crop-picker', :path => '../node_modules/react-native-image-crop-picker'
+
+  pod 'RNImageCropPicker', :path => '../node_modules/react-native-image-crop-picker'
+
   target 'diaryTests' do
     inherit! :complete
     # Pods for testing

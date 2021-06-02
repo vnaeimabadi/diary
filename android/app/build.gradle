@@ -132,6 +132,7 @@ android {
 
     defaultConfig {
         applicationId "com.diary"
+        vectorDrawables.useSupportLibrary = true
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
