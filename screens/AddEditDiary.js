@@ -20,11 +20,11 @@ import uuid from 'react-native-uuid';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import ImagePicker from 'react-native-image-crop-picker';
 
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {changedDatabaseAction} from '../store/databaseChanges';
 
 import {COLORS, FONTS, SIZES, icons} from '../constants';
-import {Colors} from 'react-native/Libraries/NewAppScreen';
+import Gallery from './component/Gallery';
 
 const AddEditDiary = ({navigation, route}) => {
   const yearId = route.params.yearId;
@@ -35,7 +35,7 @@ const AddEditDiary = ({navigation, route}) => {
   const editedTitle = route.params.title;
   const editedContent = route.params.content;
   const all_images = route.params.images;
-
+  const showGallery = useSelector(state => state.show);
   const [images, setImages] = useState(
     all_images == undefined || all_images == null ? [] : JSON.parse(all_images),
     // []
@@ -540,26 +540,48 @@ const AddEditDiary = ({navigation, route}) => {
             borderRadius: 5,
             marginHorizontal: 5,
           }}>
-          <Image
-            style={{
-              width: 80,
-              height: '100%',
-              resizeMode: 'cover',
-              borderRadius: 5,
-            }}
-            source={item}
-          />
+          <TouchableOpacity
+            onPress={() => {
+              dispatch(
+                changedDatabaseAction.updateGalleryImages(
+                  JSON.stringify(images).replace(/uri/g, 'path'),
+                ),
+              );
+              dispatch(changedDatabaseAction.showGallery(index));
+            }}>
+            <Image
+              style={{
+                width: 80,
+                height: '100%',
+                resizeMode: 'cover',
+                borderRadius: 5,
+              }}
+              source={item}
+            />
+          </TouchableOpacity>
+
           {/*diary delete button*/}
-          <View style={{position: 'absolute', top: 5, right: 5}}>
+          <View
+            style={{
+              position: 'absolute',
+              top: 1,
+              right: 1,
+              backgroundColor: COLORS.white,
+              borderBottomLeftRadius: 10,
+              borderTopRightRadius:5,
+              elevation:5
+            }}>
             <TouchableOpacity onPress={() => deleteImageDialogBox(item.id)}>
               <View
                 style={{
                   height: 30,
                   justifyContent: 'center',
                   alignItems: 'center',
+                  padding: 5,
+                  
                 }}>
                 <Image
-                  style={{width: 15, height: 15 * 1.5, marginLeft: 5}}
+                  style={{width: 10, height: 10 * 1.5}}
                   source={icons.delete_icon}
                 />
               </View>
@@ -710,6 +732,8 @@ const AddEditDiary = ({navigation, route}) => {
 
       {/* image Picker */}
       {visibleImagePicker ? renderImagePicker() : null}
+
+      {showGallery ? <Gallery /> : null}
     </View>
   );
 };

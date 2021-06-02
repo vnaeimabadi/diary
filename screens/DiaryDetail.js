@@ -15,6 +15,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {changedDatabaseAction} from '../store/databaseChanges';
 
 import {COLORS, FONTS, SIZES, icons} from '../constants';
+import Gallery from './component/Gallery';
 
 const DiaryDetail = ({navigation, route}) => {
   const id = route.params.id;
@@ -28,6 +29,8 @@ const DiaryDetail = ({navigation, route}) => {
   const [details, setDetails] = useState('');
   const [date, setDate] = useState(null);
   const [images, setImages] = useState([]);
+
+  const showGallery = useSelector(state => state.show);
 
   const reloadData = () => {
     queryDiaryListsById(yearId)
@@ -184,15 +187,25 @@ const DiaryDetail = ({navigation, route}) => {
             borderRadius: 5,
             marginHorizontal: 5,
           }}>
-          <Image
-            style={{
-              width: 80,
-              height: '100%',
-              resizeMode: 'cover',
-              borderRadius: 5,
-            }}
-            source={{uri: item.path}}
-          />
+          <TouchableOpacity
+            onPress={() => {
+              dispatch(
+                changedDatabaseAction.updateGalleryImages(
+                  JSON.stringify(images),
+                ),
+              );
+              dispatch(changedDatabaseAction.showGallery(index));
+            }}>
+            <Image
+              style={{
+                width: 80,
+                height: '100%',
+                resizeMode: 'cover',
+                borderRadius: 5,
+              }}
+              source={{uri: item.path}}
+            />
+          </TouchableOpacity>
         </View>
       );
     };
@@ -245,6 +258,8 @@ const DiaryDetail = ({navigation, route}) => {
       {renderTitle()}
 
       {renderContent()}
+
+      {showGallery ? <Gallery /> : null}
     </View>
   );
 };
