@@ -96,6 +96,7 @@ const Login = ({navigation}) => {
 
       setLoading(true);
       const credentials = await Keychain.getGenericPassword();
+
       jwt
         .sign(
           {
@@ -132,6 +133,7 @@ const Login = ({navigation}) => {
         setFirstTime(true);
       } else {
         setFirstTime(false);
+        dispatch(changedDatabaseAction.updateUserName(credentials.username));
       }
     } catch (error) {
       Alert.alert(`You don't have access!`, '', [{text: 'ok'}]);
