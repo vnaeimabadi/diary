@@ -182,17 +182,17 @@ const DiaryYearList = ({navigation}) => {
               alignItems: 'center',
             }}>
             <TouchableWithoutFeedback onPress={() => SingleDiary(item.year)}>
-              <View>
+              
                 <View
                   style={{
-                    // backgroundColor: "red",
+                    backgroundColor: item.image==""?"red":"transparent",
                     height: '100%',
                     borderRadius: 20,
                     padding: 10,
                     width: PLACE_ITEM_SIZE - 2,
                     justifyContent: 'space-between',
                   }}>
-                  <Image
+                  {item.image==""?null:<Image
                     source={{uri: item.image}}
                     style={{
                       position: 'absolute',
@@ -202,7 +202,7 @@ const DiaryYearList = ({navigation}) => {
                       bottom: 0,
                       borderRadius: 20,
                     }}
-                  />
+                  />}
                   <View
                     style={{
                       borderBottomColor: COLORS.white,
@@ -253,7 +253,8 @@ const DiaryYearList = ({navigation}) => {
                     </Text>
                   </View>
                 </View>
-              </View>
+              
+              
             </TouchableWithoutFeedback>
           </Animated.View>
         );
