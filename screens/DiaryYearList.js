@@ -182,17 +182,17 @@ const DiaryYearList = ({navigation}) => {
               alignItems: 'center',
             }}>
             <TouchableWithoutFeedback onPress={() => SingleDiary(item.year)}>
-              
-                <View
-                  style={{
-                    backgroundColor: item.image==""?"red":"transparent",
-                    height: '100%',
-                    borderRadius: 20,
-                    padding: 10,
-                    width: PLACE_ITEM_SIZE - 2,
-                    justifyContent: 'space-between',
-                  }}>
-                  {item.image==""?null:<Image
+              <View
+                style={{
+                  backgroundColor: item.image == '' ? 'red' : 'transparent',
+                  height: '100%',
+                  borderRadius: 20,
+                  padding: 10,
+                  width: PLACE_ITEM_SIZE - 2,
+                  justifyContent: 'space-between',
+                }}>
+                {item.image == '' ? null : (
+                  <Image
                     source={{uri: item.image}}
                     style={{
                       position: 'absolute',
@@ -202,59 +202,58 @@ const DiaryYearList = ({navigation}) => {
                       bottom: 0,
                       borderRadius: 20,
                     }}
-                  />}
-                  <View
-                    style={{
-                      borderBottomColor: COLORS.white,
-                      borderBottomWidth: 1,
-                    }}>
-                    <Text style={{...FONTS.body1, color: COLORS.white}}>
-                      Diary Book
-                    </Text>
-                  </View>
-
-                  <TouchableWithoutFeedback
-                    onPress={() => {
-                      coverImageYearId.current = item.year;
-                      setVisibleImagePicker(true);
-                    }}>
-                    <View style={{position: 'absolute', top: 10, right: 10}}>
-                      <View
-                        style={{
-                          height: 30,
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          display: 'flex',
-                          flexDirection: 'row',
-                        }}>
-                        <Image
-                          style={{width: 30, height: 30, marginLeft: 10}}
-                          source={icons.image_picker}
-                        />
-                      </View>
-                    </View>
-                  </TouchableWithoutFeedback>
-
-                  <View
-                    style={{
-                      backgroundColor: COLORS.blue,
-                      width: 90,
-                      height: 50,
-                      bottom: 0,
-                      right: 0,
-                      position: 'absolute',
-                      borderTopLeftRadius: 20,
-                      borderBottomRightRadius: 20,
-                    }}
                   />
-                  <View style={{alignItems: 'flex-end'}}>
-                    <Text style={{...FONTS.body1, color: COLORS.white}}>
-                      {item.year}
-                    </Text>
-                  </View>
+                )}
+                <View
+                  style={{
+                    borderBottomColor: COLORS.white,
+                    borderBottomWidth: 1,
+                  }}>
+                  <Text style={{...FONTS.body1, color: COLORS.white}}>
+                    Diary Book
+                  </Text>
                 </View>
-              
-              
+
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    coverImageYearId.current = item.year;
+                    setVisibleImagePicker(true);
+                  }}>
+                  <View style={{position: 'absolute', top: 10, right: 10}}>
+                    <View
+                      style={{
+                        height: 30,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        display: 'flex',
+                        flexDirection: 'row',
+                      }}>
+                      <Image
+                        style={{width: 30, height: 30, marginLeft: 10}}
+                        source={icons.image_picker}
+                      />
+                    </View>
+                  </View>
+                </TouchableWithoutFeedback>
+
+                <View
+                  style={{
+                    backgroundColor: COLORS.blue,
+                    width: 90,
+                    height: 50,
+                    bottom: 0,
+                    right: 0,
+                    position: 'absolute',
+                    borderTopLeftRadius: 20,
+                    borderBottomRightRadius: 20,
+                  }}
+                />
+                <View style={{alignItems: 'flex-end'}}>
+                  <Text style={{...FONTS.body1, color: COLORS.white}}>
+                    {item.year}
+                  </Text>
+                </View>
+              </View>
             </TouchableWithoutFeedback>
           </Animated.View>
         );
