@@ -10,7 +10,6 @@ import {
   Animated,
   TouchableOpacity,
   BackHandler,
-  ScrollView,
 } from 'react-native';
 
 import {useSelector} from 'react-redux';
@@ -25,6 +24,9 @@ const PLACE_ITEM_SIZE =
 const EMPTY_ITEM_SIZE = (SIZES.width - PLACE_ITEM_SIZE) / 2;
 
 let firstAdd = true;
+
+let covers = ['orang', 'red', 'blue', 'yellow', 'green', 'pink'];
+
 const DiaryYearList = ({navigation}) => {
   const [diaryList, setDiaryList] = useState([]);
   const diaryScrollX = useRef(new Animated.Value(0)).current;
@@ -46,7 +48,8 @@ const DiaryYearList = ({navigation}) => {
     setVisibleImagePicker(false);
   };
   const addImageHandler = data => {
-    coverImage.current = data[0].uri;
+    // coverImage.current = data[0].uri;
+    coverImage.current = data;
 
     console.log(data);
     setVisibleImagePicker(false);
@@ -57,7 +60,8 @@ const DiaryYearList = ({navigation}) => {
     updateDiaryYearImage(id, img)
       .then(data => {
         // dispatch(changedDatabaseAction.singleDiaryEditedChanged());
-        console.log(data);
+        // console.log(data);
+        reloadData()
       })
       .catch(error => {
         console.log('error-insert');
@@ -184,32 +188,34 @@ const DiaryYearList = ({navigation}) => {
             <TouchableWithoutFeedback onPress={() => SingleDiary(item.year)}>
               <View
                 style={{
-                  backgroundColor: item.image == '' ? 'red' : 'transparent',
+                  backgroundColor:
+                    item.image == '' ? 'transparent' : 'transparent',
                   height: '100%',
                   borderRadius: 20,
                   padding: 10,
                   width: PLACE_ITEM_SIZE - 2,
                   justifyContent: 'space-between',
                 }}>
-                {item.image == '' ? null : (
-                  <Image
-                    source={{uri: item.image}}
-                    style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      borderRadius: 20,
-                    }}
-                  />
-                )}
+                <Image
+                  source={
+                    item.image == '' ? icons.cover_pink : getCoverUri(item.image)
+                  }
+                  style={{
+                    position: 'absolute',
+                    width: PLACE_ITEM_SIZE - 2,
+                    height: '106%',
+                    borderRadius: 0,
+                    resizeMode: 'stretch',
+                  }}
+                />
+                
                 <View
                   style={{
-                    borderBottomColor: COLORS.white,
+                    borderBottomColor: item.image=="yellow"?COLORS.black:COLORS.white,
                     borderBottomWidth: 1,
+                    paddingLeft: 20,
                   }}>
-                  <Text style={{...FONTS.body1, color: COLORS.white}}>
+                  <Text style={{...FONTS.body1, color: item.image=="yellow"?COLORS.black:COLORS.white}}>
                     Diary Book
                   </Text>
                 </View>
@@ -321,6 +327,130 @@ const DiaryYearList = ({navigation}) => {
     );
   };
 
+  const getCoverUri = name => {
+    let uris = null;
+    switch (name) {
+      case 'blue':
+        uris = icons.cover_blue;
+        break;
+      case 'orang':
+        uris = icons.cover_orang;
+        break;
+      case 'red':
+        uris = icons.cover_red;
+        break;
+      case 'yellow':
+        uris = icons.cover_yellow;
+        break;
+      case 'green':
+        uris = icons.cover_green;
+        break;
+      case 'pink':
+        uris = icons.cover_pink;
+        break;
+    }
+
+    return uris;
+  };
+  const renderBookCover = () => {
+    const renderImageList = ({item, index}) => {
+      return (
+        <View
+          style={{
+            height: '100%',
+            width: 100,
+            padding: 5,
+            borderRadius: 5,
+            marginHorizontal: 5,
+          }}>
+          <TouchableOpacity
+            onPress={() => {
+              addImageHandler(item)
+            }}>
+            <Image
+              style={{
+                width: 80,
+                height: '100%',
+                resizeMode: 'cover',
+                borderRadius: 5,
+              }}
+              source={getCoverUri(item)}
+            />
+          </TouchableOpacity>
+        </View>
+      );
+    };
+
+    return (
+      <View
+        style={{
+          position: 'absolute',
+          zIndex: 100,
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: COLORS.gray,
+          opacity: 0.8,
+          justifyContent: 'flex-end',
+        }}>
+        <View
+          style={{
+            display: 'flex',
+            height: '30%',
+            backgroundColor: COLORS.darkBlue,
+            borderTopLeftRadius: 25,
+            borderTopRightRadius: 25,
+            
+            opacity: 1,
+          }}>
+          <View style={{
+              flex: 3,
+              justifyContent: 'center',
+              alignItems: 'center',
+              alignContent:'center',
+              height: "100%",
+              padding:10,
+            }}>
+            <FlatList
+              horizontal
+              
+              contentContainerStyle={{
+                height: "100%",
+                // backgroundColor:"pink",
+                alignSelf: 'center',
+                justifyContent:"center"
+              }}
+              data={covers}
+              keyExtractor={item => `cover-${item}`}
+              renderItem={renderImageList}
+            />
+          </View>
+
+          
+
+          <View
+            style={{
+              flex: 1,
+              backgroundColor: COLORS.red,
+              justifyContent: 'center',
+              alignItems: 'center',
+            }}>
+            <TouchableOpacity
+              style={{
+                justifyContent: 'center',
+                alignItems: 'center',
+                width: '100%',
+                height: '100%',
+              }}>
+              <Text style={{...FONTS.body3, color: COLORS.white}}>cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    );
+  };
+
   useEffect(() => {
     reloadData();
   }, []);
@@ -340,12 +470,14 @@ const DiaryYearList = ({navigation}) => {
         ? renderDiaryBookByYear()
         : renderDiaryAddButtonIfEmptyDiaryList()}
       {renderAddStoryButton()}
-      {visibleImagePicker ? (
+      {/* {visibleImagePicker ? (
         <MyImagePicker
           addImage={img => addImageHandler(img)}
           close={closeHandler}
         />
-      ) : null}
+      ) : null} */}
+
+      {visibleImagePicker?renderBookCover():null}
     </View>
   );
 };

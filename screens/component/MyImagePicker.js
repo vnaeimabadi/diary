@@ -130,6 +130,7 @@ const MyImagePicker = props => {
           </View>
         </View>
       </View>
+    
     );
   };
 
