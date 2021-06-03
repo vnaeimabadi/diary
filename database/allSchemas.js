@@ -83,7 +83,7 @@ export const updateDiaryList = (id, data, index) =>
       .catch(error => reject(error));
   });
 
-export const updateDiaryYearImage = (id, data) =>
+export const updateDiaryYearImage = (id, image) =>
   new Promise((resolve, reject) => {
     Realm.open(databaseOptions)
       .then(realm => {
@@ -92,7 +92,7 @@ export const updateDiaryYearImage = (id, data) =>
             .objects(DIARYLIST_SCHEMA)
             .filtered('year == $0', id);
 
-          filterYear[0].image = data.images;
+          filterYear[0].image = image;
 
           resolve(filterYear);
         });

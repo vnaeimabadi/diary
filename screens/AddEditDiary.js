@@ -25,6 +25,7 @@ import {changedDatabaseAction} from '../store/databaseChanges';
 
 import {COLORS, FONTS, SIZES, icons} from '../constants';
 import Gallery from './component/Gallery';
+import MyImagePicker from './component/MyImagePicker';
 
 const AddEditDiary = ({navigation, route}) => {
   const yearId = route.params.yearId;
@@ -254,6 +255,23 @@ const AddEditDiary = ({navigation, route}) => {
 
     setImages(temp);
   };
+
+  const closeHandler=()=>{
+    setVisibleImagePicker(false);
+  }
+  const addImageHandler=(data)=>{
+    
+    let temp = [...images];
+    temp.push({
+      id: uuid.v4(),
+      uri: data[0].uri,
+      mime: data[0].mime,
+    });
+    console.log(temp);
+    console.log(data);
+    setImages(temp);
+    setVisibleImagePicker(false);
+  }
 
   const renderImagePicker = () => {
     return (
@@ -732,7 +750,8 @@ const AddEditDiary = ({navigation, route}) => {
       {renderFooter()}
 
       {/* image Picker */}
-      {visibleImagePicker ? renderImagePicker() : null}
+      {/* {visibleImagePicker ? renderImagePicker() : null} */}
+      {visibleImagePicker?<MyImagePicker addImage={(img)=>addImageHandler(img)} close={closeHandler}/>:null}
 
       {showGallery ? <Gallery /> : null}
     </View>

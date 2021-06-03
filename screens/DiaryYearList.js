@@ -15,9 +15,10 @@ import {
 
 import {useSelector} from 'react-redux';
 
-import {queryAllDiaryLists} from '../database/allSchemas';
+import {queryAllDiaryLists, updateDiaryYearImage} from '../database/allSchemas';
 
 import {icons, FONTS, SIZES, COLORS} from '../constants/index';
+import MyImagePicker from './component/MyImagePicker';
 
 const PLACE_ITEM_SIZE =
   Platform.OS === 'ios' ? SIZES.width / 1.25 : SIZES.width / 1.2;
@@ -29,6 +30,9 @@ const DiaryYearList = ({navigation}) => {
   const diaryScrollX = useRef(new Animated.Value(0)).current;
   const newDiaryYearAdded = useSelector(status => status.diaryYear);
   const userName = useSelector(status => status.userName);
+  const [visibleImagePicker, setVisibleImagePicker] = useState(false);
+  const coverImage = useRef('');
+  const coverImageYearId = useRef('');
 
   const addNewDiary = () => {
     navigation.navigate('AddEditDiary', {yearId: ''});
@@ -36,6 +40,29 @@ const DiaryYearList = ({navigation}) => {
 
   const SingleDiary = year => {
     navigation.navigate('DiaryList', {yearId: year});
+  };
+
+  const closeHandler = () => {
+    setVisibleImagePicker(false);
+  };
+  const addImageHandler = data => {
+    coverImage.current = data[0].uri;
+
+    console.log(data);
+    setVisibleImagePicker(false);
+    updateImage(coverImageYearId.current, coverImage.current);
+  };
+
+  const updateImage = (id, img) => {
+    updateDiaryYearImage(id, img)
+      .then(data => {
+        // dispatch(changedDatabaseAction.singleDiaryEditedChanged());
+        console.log(data);
+      })
+      .catch(error => {
+        console.log('error-insert');
+        console.log(error);
+      });
   };
 
   const reloadData = () => {
@@ -158,13 +185,24 @@ const DiaryYearList = ({navigation}) => {
               <View>
                 <View
                   style={{
-                    backgroundColor: 'red',
+                    // backgroundColor: "red",
                     height: '100%',
                     borderRadius: 20,
                     padding: 10,
                     width: PLACE_ITEM_SIZE - 2,
                     justifyContent: 'space-between',
                   }}>
+                  <Image
+                    source={{uri: item.image}}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      borderRadius: 20,
+                    }}
+                  />
                   <View
                     style={{
                       borderBottomColor: COLORS.white,
@@ -174,7 +212,29 @@ const DiaryYearList = ({navigation}) => {
                       Diary Book
                     </Text>
                   </View>
-                  
+
+                  <TouchableWithoutFeedback
+                    onPress={() => {
+                      coverImageYearId.current = item.year;
+                      setVisibleImagePicker(true);
+                    }}>
+                    <View style={{position: 'absolute', top: 10, right: 10}}>
+                      <View
+                        style={{
+                          height: 30,
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          display: 'flex',
+                          flexDirection: 'row',
+                        }}>
+                        <Image
+                          style={{width: 30, height: 30, marginLeft: 10}}
+                          source={icons.image_picker}
+                        />
+                      </View>
+                    </View>
+                  </TouchableWithoutFeedback>
+
                   <View
                     style={{
                       backgroundColor: COLORS.blue,
@@ -280,6 +340,12 @@ const DiaryYearList = ({navigation}) => {
         ? renderDiaryBookByYear()
         : renderDiaryAddButtonIfEmptyDiaryList()}
       {renderAddStoryButton()}
+      {visibleImagePicker ? (
+        <MyImagePicker
+          addImage={img => addImageHandler(img)}
+          close={closeHandler}
+        />
+      ) : null}
     </View>
   );
 };
