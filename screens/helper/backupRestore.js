@@ -1,5 +1,4 @@
 import RNFS from 'react-native-fs';
-import {DevSettings} from 'react-native';
 import {requestMultiple, PERMISSIONS} from 'react-native-permissions';
 import DocumentPicker from 'react-native-document-picker';
 import {
