@@ -11,13 +11,12 @@ import {
   TouchableOpacity,
   BackHandler,
 } from 'react-native';
-
 import {useSelector} from 'react-redux';
 
 import {queryAllDiaryLists, updateDiaryYearImage} from '../database/allSchemas';
 
 import {icons, FONTS, SIZES, COLORS} from '../constants/index';
-import MyImagePicker from './component/MyImagePicker';
+import {backup_database, restore_database} from './helper/backupRestore';
 
 const PLACE_ITEM_SIZE =
   Platform.OS === 'ios' ? SIZES.width / 1.25 : SIZES.width / 1.2;
@@ -48,10 +47,9 @@ const DiaryYearList = ({navigation}) => {
     setVisibleImagePicker(false);
   };
   const addImageHandler = data => {
-    // coverImage.current = data[0].uri;
+    // //// coverImage.current = data[0].uri;
     coverImage.current = data;
 
-    console.log(data);
     setVisibleImagePicker(false);
     updateImage(coverImageYearId.current, coverImage.current);
   };
@@ -61,7 +59,7 @@ const DiaryYearList = ({navigation}) => {
       .then(data => {
         // dispatch(changedDatabaseAction.singleDiaryEditedChanged());
         // console.log(data);
-        reloadData()
+        reloadData();
       })
       .catch(error => {
         console.log('error-insert');
@@ -117,27 +115,106 @@ const DiaryYearList = ({navigation}) => {
     );
   };
 
+  const restore = async () => {
+    const isTrue = await restore_database();
+    if (isTrue) {
+      reloadData()
+    }
+  };
+
   const renderAddStoryButton = () => {
     return (
-      <TouchableWithoutFeedback onPress={addNewDiary}>
-        <View
+      <View
+        style={{
+          position: 'absolute',
+          right: 0,
+          bottom: 0,
+          minWidth: 100,
+          height: 50,
+          backgroundColor: '#3663A8',
+          display: 'flex',
+          justifyContent: 'center',
+          alignContent: 'center',
+          borderTopLeftRadius: 25,
+        }}>
+        <TouchableOpacity
+          onPress={addNewDiary}
           style={{
-            position: 'absolute',
-            right: 0,
-            bottom: 0,
-            minWidth: 100,
-            height: 50,
-            backgroundColor: '#3663A8',
-            display: 'flex',
-            justifyContent: 'center',
-            alignContent: 'center',
             borderTopLeftRadius: 25,
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderTopRightRadius: 25,
+            width: '100%',
+            height: '100%',
           }}>
           <Text style={{color: 'white', ...FONTS.h3, textAlign: 'center'}}>
             Add Story
           </Text>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const renderRestoreButton = () => {
+    return (
+      <View
+        style={{
+          position: 'absolute',
+          left: 100,
+          bottom: 0,
+          minWidth: 100,
+          height: 50,
+          backgroundColor: 'green',
+          display: 'flex',
+          justifyContent: 'center',
+          alignContent: 'center',
+          borderTopRightRadius: 25,
+        }}>
+        <TouchableOpacity
+          onPress={restore}
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderTopRightRadius: 25,
+            width: '100%',
+            height: '100%',
+          }}>
+          <Text style={{color: 'white', ...FONTS.h3, textAlign: 'center'}}>
+            Restore
+          </Text>
+        </TouchableOpacity>
+      </View>
+    );
+  };
+
+  const renderBackupButton = () => {
+    return (
+      <View
+        style={{
+          position: 'absolute',
+          left: 0,
+          bottom: 0,
+          minWidth: 100,
+          height: 50,
+          backgroundColor: '#3663A8',
+          display: 'flex',
+          justifyContent: 'center',
+          alignContent: 'center',
+        }}>
+        <TouchableOpacity
+          onPress={backup_database}
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            borderTopRightRadius: 25,
+            width: '100%',
+            height: '100%',
+          }}>
+          <Text style={{color: 'white', ...FONTS.h3, textAlign: 'center'}}>
+            Backup
+          </Text>
+        </TouchableOpacity>
+      </View>
     );
   };
 
@@ -198,7 +275,9 @@ const DiaryYearList = ({navigation}) => {
                 }}>
                 <Image
                   source={
-                    item.image == '' ? icons.cover_pink : getCoverUri(item.image)
+                    item.image == ''
+                      ? icons.cover_pink
+                      : getCoverUri(item.image)
                   }
                   style={{
                     position: 'absolute',
@@ -208,14 +287,20 @@ const DiaryYearList = ({navigation}) => {
                     resizeMode: 'stretch',
                   }}
                 />
-                
+
                 <View
                   style={{
-                    borderBottomColor: item.image=="yellow"?COLORS.black:COLORS.white,
+                    borderBottomColor:
+                      item.image == 'yellow' ? COLORS.black : COLORS.white,
                     borderBottomWidth: 1,
                     paddingLeft: 20,
                   }}>
-                  <Text style={{...FONTS.body1, color: item.image=="yellow"?COLORS.black:COLORS.white}}>
+                  <Text
+                    style={{
+                      ...FONTS.body1,
+                      color:
+                        item.image == 'yellow' ? COLORS.black : COLORS.white,
+                    }}>
                     Diary Book
                   </Text>
                 </View>
@@ -224,6 +309,7 @@ const DiaryYearList = ({navigation}) => {
                   onPress={() => {
                     coverImageYearId.current = item.year;
                     setVisibleImagePicker(true);
+                    // backup_database();
                   }}>
                   <View style={{position: 'absolute', top: 10, right: 10}}>
                     <View
@@ -365,7 +451,7 @@ const DiaryYearList = ({navigation}) => {
           }}>
           <TouchableOpacity
             onPress={() => {
-              addImageHandler(item)
+              addImageHandler(item);
             }}>
             <Image
               style={{
@@ -401,33 +487,31 @@ const DiaryYearList = ({navigation}) => {
             backgroundColor: COLORS.darkBlue,
             borderTopLeftRadius: 25,
             borderTopRightRadius: 25,
-            
+
             opacity: 1,
           }}>
-          <View style={{
+          <View
+            style={{
               flex: 3,
               justifyContent: 'center',
               alignItems: 'center',
-              alignContent:'center',
-              height: "100%",
-              padding:10,
+              alignContent: 'center',
+              height: '100%',
+              padding: 10,
             }}>
             <FlatList
               horizontal
-              
               contentContainerStyle={{
-                height: "100%",
+                height: '100%',
                 // backgroundColor:"pink",
                 alignSelf: 'center',
-                justifyContent:"center"
+                justifyContent: 'center',
               }}
               data={covers}
               keyExtractor={item => `cover-${item}`}
               renderItem={renderImageList}
             />
           </View>
-
-          
 
           <View
             style={{
@@ -470,6 +554,8 @@ const DiaryYearList = ({navigation}) => {
         ? renderDiaryBookByYear()
         : renderDiaryAddButtonIfEmptyDiaryList()}
       {renderAddStoryButton()}
+      {renderBackupButton()}
+      {renderRestoreButton()}
       {/* {visibleImagePicker ? (
         <MyImagePicker
           addImage={img => addImageHandler(img)}
@@ -477,7 +563,7 @@ const DiaryYearList = ({navigation}) => {
         />
       ) : null} */}
 
-      {visibleImagePicker?renderBookCover():null}
+      {visibleImagePicker ? renderBookCover() : null}
     </View>
   );
 };

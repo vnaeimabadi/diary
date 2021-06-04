@@ -63,6 +63,25 @@ export const insertDiaryList = data =>
       .catch(error => reject(error));
   });
 
+  export const restoreDiaryList = data =>
+  new Promise((resolve, reject) => {
+    Realm.open(databaseOptions)
+      .then(realm => {
+        realm.write(() => {
+          let allDiaryList = realm.objects(DIARYLIST_SCHEMA);
+          for (let index in allDiaryList) {
+            realm.delete(allDiaryList[index].diaries);
+          }
+          realm.delete(allDiaryList);
+          resolve();
+          
+          // realm.create(DIARYLIST_SCHEMA, data);
+          // resolve(data);
+        });
+      })
+      .catch(error => reject(error));
+  });
+
 export const updateDiaryList = (id, data, index) =>
   new Promise((resolve, reject) => {
     Realm.open(databaseOptions)

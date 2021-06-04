@@ -138,7 +138,7 @@ const AddEditDiary = ({navigation, route}) => {
       color: '#f0a0f0',
       createdTs: datePickerDate,
       updatedTs: datePickerDate,
-      image:""
+      image: '',
     };
 
     insertDiaryList(newDiaryContent)
@@ -214,6 +214,11 @@ const AddEditDiary = ({navigation, route}) => {
       });
     }
 
+    console.log(
+      'images----------------------------------------------->vali-naeim',
+    );
+    console.log(addImages);
+
     const updateDiaryContent = {
       id: `diary`,
       title: title,
@@ -256,14 +261,15 @@ const AddEditDiary = ({navigation, route}) => {
     setImages(temp);
   };
 
-  const closeHandler=()=>{
+  const closeHandler = () => {
     setVisibleImagePicker(false);
-  }
-  const addImageHandler=(data)=>{
-    
+  };
+  const addImageHandler = data => {
+    let newId = Math.floor(Date.now() / 1000);
     let temp = [...images];
     temp.push({
-      id: uuid.v4(),
+      // id: uuid.v4(),
+      id: `diary-image-${newId}`,
       uri: data[0].uri,
       mime: data[0].mime,
     });
@@ -271,7 +277,7 @@ const AddEditDiary = ({navigation, route}) => {
     console.log(data);
     setImages(temp);
     setVisibleImagePicker(false);
-  }
+  };
 
   const renderImagePicker = () => {
     return (
@@ -311,9 +317,11 @@ const AddEditDiary = ({navigation, route}) => {
                   forceJpg: true,
                 })
                   .then(i => {
+                    let newId = Math.floor(Date.now() / 1000);
                     let temp = [...images];
                     temp.push({
-                      id: uuid.v4(),
+                      // id: uuid.v4(),
+                      id: `diary-image-${newId}`,
                       uri: i.path,
                       mime: i.mime,
                     });
@@ -348,9 +356,11 @@ const AddEditDiary = ({navigation, route}) => {
                   forceJpg: true,
                 })
                   .then(i => {
+                    let newId = Math.floor(Date.now() / 1000);
                     let temp = [...images];
                     temp.push({
-                      id: uuid.v4(),
+                      // id: uuid.v4(),
+                      id: `diary-image-${newId}`,
                       uri: i.path,
                       mime: i.mime,
                     });
@@ -587,8 +597,8 @@ const AddEditDiary = ({navigation, route}) => {
               right: 1,
               backgroundColor: COLORS.white,
               borderBottomLeftRadius: 10,
-              borderTopRightRadius:5,
-              elevation:5
+              borderTopRightRadius: 5,
+              elevation: 5,
             }}>
             <TouchableOpacity onPress={() => deleteImageDialogBox(item.id)}>
               <View
@@ -597,7 +607,6 @@ const AddEditDiary = ({navigation, route}) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                   padding: 5,
-                  
                 }}>
                 <Image
                   style={{width: 10, height: 10 * 1.5}}
@@ -751,7 +760,12 @@ const AddEditDiary = ({navigation, route}) => {
 
       {/* image Picker */}
       {/* {visibleImagePicker ? renderImagePicker() : null} */}
-      {visibleImagePicker?<MyImagePicker addImage={(img)=>addImageHandler(img)} close={closeHandler}/>:null}
+      {visibleImagePicker ? (
+        <MyImagePicker
+          addImage={img => addImageHandler(img)}
+          close={closeHandler}
+        />
+      ) : null}
 
       {showGallery ? <Gallery /> : null}
     </View>
