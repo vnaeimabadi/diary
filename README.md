@@ -27,4 +27,29 @@
 
 ## show preview of readme in vscode press ctrl+shift+v
 
-![My Diary](./assets/icons/cover_blue.png?v=4&s=200)
+<!-- ![My Diary](./assets/icons/cover_blue.png?v=4&s=180) -->
+<img src="./assets/app-images/app-1.png" width="180" height="300">
+<img src="./assets/app-images/app-2.png" width="180" height="300">
+<img src="./assets/app-images/app-3.png" width="180" height="300">
+<img src="./assets/app-images/app-4.png" width="180" height="300">
+<img src="./assets/app-images/app-5.png" width="180" height="300">
+<img src="./assets/app-images/app-6.png" width="180" height="300">
+<img src="./assets/app-images/app-7.png" width="180" height="300">
+<img src="./assets/app-images/app-8.png" width="180" height="300">
+<img src="./assets/app-images/app-9.png" width="180" height="300">
+<img src="./assets/app-images/app-10.png" width="180" height="300">
+<img src="./assets/app-images/app-11.png" width="180" height="300">
+<img src="./assets/app-images/app-12.png" width="180" height="300">
+<img src="./assets/app-images/app-13.png" width="180" height="300">
+<img src="./assets/app-images/app-14.png" width="180" height="300">
+<img src="./assets/app-images/app-15.png" width="180" height="300">
+<img src="./assets/app-images/app-16.png" width="180" height="300">
+<img src="./assets/app-images/app-17.png" width="180" height="300">
+<img src="./assets/app-images/app-18.png" width="180" height="300">
+<img src="./assets/app-images/app-19.png" width="180" height="300">
+<img src="./assets/app-images/app-20.png" width="180" height="300">
+<img src="./assets/app-images/app-21.png" width="180" height="300">
+<img src="./assets/app-images/app-22.png" width="180" height="300">
+<img src="./assets/app-images/app-23.png" width="180" height="300">
+<img src="./assets/app-images/app-24.png" width="180" height="300">
+<img src="./assets/app-images/app-25.png" width="180" height="300">
