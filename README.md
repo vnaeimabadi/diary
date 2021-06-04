@@ -25,5 +25,6 @@
 
 * npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
 
+## show preview of readme in vscode press ctrl+shift+v
 
-![My Diary](./assets/icons/cover_blue.png)
+![My Diary](./assets/icons/cover_blue.png?v=4&s=200)
