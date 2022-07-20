@@ -63,7 +63,7 @@ export const insertDiaryList = data =>
       .catch(error => reject(error));
   });
 
-  export const restoreDiaryList = data =>
+export const restoreDiaryList = data =>
   new Promise((resolve, reject) => {
     Realm.open(databaseOptions)
       .then(realm => {
@@ -74,7 +74,7 @@ export const insertDiaryList = data =>
           }
           realm.delete(allDiaryList);
           resolve();
-          
+
           // realm.create(DIARYLIST_SCHEMA, data);
           // resolve(data);
         });

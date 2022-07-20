@@ -8,7 +8,7 @@ const initialState = {
   diaryYearDeleted: false,
   userName: '',
   show: false,
-  selectedImage:0,
+  selectedImage: 0,
   images: [],
 };
 

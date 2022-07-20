@@ -213,7 +213,7 @@ const Login = ({navigation}) => {
             </Text>
           ) : null}
         </View>
-      ) ;
+      );
     };
 
     const renderPassword = () => {

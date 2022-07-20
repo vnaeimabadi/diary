@@ -90,7 +90,7 @@ const MyImagePicker = props => {
                       uri: i.path,
                       mime: i.mime,
                     });
-                    props.addImage(temp)
+                    props.addImage(temp);
                     // setImages(temp);
                     // setVisibleImagePicker(false);
                   })
@@ -130,7 +130,6 @@ const MyImagePicker = props => {
           </View>
         </View>
       </View>
-    
     );
   };
 

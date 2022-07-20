@@ -37,7 +37,7 @@ const DiaryDetail = ({navigation, route}) => {
       .then(data => {
         // setDiaryList(data);
         let dd = data[0].diaries.filter((da, index) => {
-          if (da.id == id) {
+          if (da.id === id) {
             selectedIndex.current = index;
             // return da.id == id;
             return da;
@@ -52,7 +52,7 @@ const DiaryDetail = ({navigation, route}) => {
       .catch(error => {
         console.log('error-reload');
         console.log(error);
-        setDiaryList([]);
+        // setDiaryList([]);
       });
   };
 

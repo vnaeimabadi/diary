@@ -25,5 +25,5 @@ export default {
   cover_blue,
   cover_yellow,
   cover_green,
-  cover_pink
+  cover_pink,
 };

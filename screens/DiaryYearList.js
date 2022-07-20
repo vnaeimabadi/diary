@@ -118,7 +118,7 @@ const DiaryYearList = ({navigation}) => {
   const restore = async () => {
     const isTrue = await restore_database();
     if (isTrue) {
-      reloadData()
+      reloadData();
     }
   };
 

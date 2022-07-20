@@ -1,14 +1,5 @@
-import React,{useEffect} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-import SplashScreen from 'react-native-splash-screen'
+import React, {useEffect} from 'react';
+import SplashScreen from 'react-native-splash-screen';
 import {Provider} from 'react-redux';
 import {createStackNavigator} from '@react-navigation/stack';
 import {NavigationContainer} from '@react-navigation/native';
@@ -21,14 +12,13 @@ import {
   DiaryDetail,
 } from './screens';
 
-import store from './store/index'
+import store from './store/index';
 
 const Stack = createStackNavigator();
 const App = () => {
-
-  useEffect(()=>{
+  useEffect(() => {
     SplashScreen.hide();
-  },[])
+  }, []);
 
   return (
     <Provider store={store}>
@@ -48,7 +38,5 @@ const App = () => {
     </Provider>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default App;

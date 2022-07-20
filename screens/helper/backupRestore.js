@@ -53,7 +53,6 @@ const backup_database = async () => {
 const restore_database = async () => {
   // Pick a single file
   try {
-    
     const res = await DocumentPicker.pick({
       type: [DocumentPicker.types.plainText],
     });
@@ -65,7 +64,7 @@ const restore_database = async () => {
     // );
 
     var restore_data = await RNFS.readFile(res.uri, 'utf8');
-   
+
     const diaries = JSON.parse(restore_data);
     if (diaries.length > 0) {
       await deleteAllDiaryLists();
@@ -114,7 +113,6 @@ const addEachDiary = async data => {
         };
       });
     }
-
 
     const newDiaryContent = {
       id: diary.id,
