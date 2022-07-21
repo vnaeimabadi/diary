@@ -26,7 +26,7 @@ let firstAdd = true;
 
 let covers = ['orang', 'red', 'blue', 'yellow', 'green', 'pink'];
 
-const DiaryYearList = ({navigation}) => {
+const DiaryYearList = ({navigation}: any) => {
   const [diaryList, setDiaryList] = useState([]);
   const diaryScrollX = useRef(new Animated.Value(0)).current;
   const newDiaryYearAdded = useSelector(status => status.diaryYear);
@@ -39,14 +39,14 @@ const DiaryYearList = ({navigation}) => {
     navigation.navigate('AddEditDiary', {yearId: ''});
   };
 
-  const SingleDiary = year => {
+  const SingleDiary = (year: any) => {
     navigation.navigate('DiaryList', {yearId: year});
   };
 
   const closeHandler = () => {
     setVisibleImagePicker(false);
   };
-  const addImageHandler = data => {
+  const addImageHandler = (data: any) => {
     // //// coverImage.current = data[0].uri;
     coverImage.current = data;
 
@@ -54,7 +54,7 @@ const DiaryYearList = ({navigation}) => {
     updateImage(coverImageYearId.current, coverImage.current);
   };
 
-  const updateImage = (id, img) => {
+  const updateImage = (id: any, img: any) => {
     updateDiaryYearImage(id, img)
       .then(data => {
         // dispatch(changedDatabaseAction.singleDiaryEditedChanged());
@@ -106,7 +106,7 @@ const DiaryYearList = ({navigation}) => {
         {renderLogout()}
         <Image style={{width: 50 / 1.3, height: 50}} source={icons.logo} />
         <Text style={{...FONTS.h3}}>Good morning, {userName}!</Text>
-        <Text style={{...FONTS.h6}}>
+        <Text style={{...FONTS.h4}}>
           {diaryList.length > 0
             ? 'Select Your Diary Year!'
             : 'How Have You Been Today?'}
@@ -219,7 +219,7 @@ const DiaryYearList = ({navigation}) => {
   };
 
   const renderDiaryBookByYear = () => {
-    const renderItem = ({item, index}) => {
+    const renderItem = ({item, index}: any) => {
       const opacity = diaryScrollX.interpolate({
         inputRange: [
           (index - 2) * PLACE_ITEM_SIZE,
@@ -413,7 +413,7 @@ const DiaryYearList = ({navigation}) => {
     );
   };
 
-  const getCoverUri = name => {
+  const getCoverUri = (name: any) => {
     let uris = null;
     switch (name) {
       case 'blue':
@@ -439,7 +439,7 @@ const DiaryYearList = ({navigation}) => {
     return uris;
   };
   const renderBookCover = () => {
-    const renderImageList = ({item, index}) => {
+    const renderImageList = ({item, index}: any) => {
       return (
         <View
           style={{
@@ -544,7 +544,8 @@ const DiaryYearList = ({navigation}) => {
       firstAdd = false;
       return;
     }
-    reloadData(true);
+    // reloadData(true);
+    reloadData();
   }, [newDiaryYearAdded]);
 
   return (

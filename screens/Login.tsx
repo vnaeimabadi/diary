@@ -17,7 +17,7 @@ import {COLORS, FONTS, SIZES, icons, theme} from '../constants';
 import * as Keychain from 'react-native-keychain';
 import jwt from 'react-native-pure-jwt';
 
-const Login = ({navigation}) => {
+const Login = ({navigation}: any) => {
   const dispatch = useDispatch();
   const userName = useSelector(status => status.userName);
 
@@ -26,14 +26,14 @@ const Login = ({navigation}) => {
   const [nameError, setNameError] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState(false);
-  const [firstTime, setFirstTime] = useState(null);
+  const [firstTime, setFirstTime] = useState<Boolean | null>(null);
 
-  const updateName = value => {
+  const updateName = (value: any) => {
     setName(value);
     if (nameError) setNameError(false);
   };
 
-  const updatePassword = value => {
+  const updatePassword = (value: any) => {
     setPassword(value);
     if (passwordError) setPasswordError(false);
   };
@@ -69,14 +69,14 @@ const Login = ({navigation}) => {
           alg: 'HS256',
         },
       )
-      .then(token => {
+      .then((token: any) => {
         setKeychain(token);
       }) // token as the only argument
-      .catch(err => {
+      .catch((err: any) => {
         setLoading(false);
       }); // possible errors
   };
-  const setKeychain = async userToken => {
+  const setKeychain = async (userToken: any) => {
     const dd = await Keychain.setGenericPassword(name, userToken);
     setLoading(false);
     dispatch(changedDatabaseAction.updateUserName(name));
@@ -107,7 +107,7 @@ const Login = ({navigation}) => {
             alg: 'HS256',
           },
         )
-        .then(token => {
+        .then((token: any) => {
           setLoading(false);
           if (credentials.password == token) {
             navigation.replace('DiaryYearList');
@@ -116,7 +116,7 @@ const Login = ({navigation}) => {
             // console.log('wrong password');
           }
         }) // token as the only argument
-        .catch(err => {
+        .catch((err: any) => {
           setLoading(false);
         });
     } catch (error) {
@@ -143,13 +143,13 @@ const Login = ({navigation}) => {
   const removeCredentials = async () => {
     try {
       const credentials = await Keychain.resetGenericPassword();
-      console.log(JSON.parse(credentials));
+      // console.log(JSON.parse(credentials));
     } catch (error) {
       console.log("Keychain couldn't be accessed!", error);
     }
   };
 
-  const renderMainContent = (title, isRegister = false) => {
+  const renderMainContent = (title: any, isRegister = false) => {
     const renderLoginButton = () => {
       return (
         <TouchableOpacity onPress={checkUserStatus}>
@@ -257,7 +257,7 @@ const Login = ({navigation}) => {
       );
     };
 
-    const renderTitle = title => {
+    const renderTitle = (title: any) => {
       return (
         <View
           style={{position: 'absolute', elevation: 5, top: 16, left: '20%'}}>

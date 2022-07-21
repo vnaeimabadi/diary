@@ -1,4 +1,4 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React, {useRef, useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {View, FlatList, Image, TouchableOpacity} from 'react-native';
 import {COLORS, SIZES, icons} from '../../constants/index';
