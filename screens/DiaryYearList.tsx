@@ -56,7 +56,7 @@ const DiaryYearList = ({navigation}: any) => {
 
   const updateImage = (id: any, img: any) => {
     updateDiaryYearImage(id, img)
-      .then(data => {
+      .then(() => {
         // dispatch(changedDatabaseAction.singleDiaryEditedChanged());
         // console.log(data);
         reloadData();
@@ -69,7 +69,7 @@ const DiaryYearList = ({navigation}: any) => {
 
   const reloadData = () => {
     queryAllDiaryLists()
-      .then(data => {
+      .then((data: any) => {
         if (data.length > 0) {
           let dat = [...data].sort((a, b) => b.year - a.year);
           setDiaryList([{id: -1}, ...dat, {id: -2}]);
@@ -256,8 +256,8 @@ const DiaryYearList = ({navigation}: any) => {
       } else {
         return (
           <Animated.View
-            opacity={opacity}
             style={{
+              opacity: opacity,
               width: PLACE_ITEM_SIZE,
               height: height,
               alignItems: 'center',
@@ -266,7 +266,7 @@ const DiaryYearList = ({navigation}: any) => {
               <View
                 style={{
                   backgroundColor:
-                    item.image == '' ? 'transparent' : 'transparent',
+                    item.image === '' ? 'transparent' : 'transparent',
                   height: '100%',
                   borderRadius: 20,
                   padding: 10,
@@ -439,7 +439,7 @@ const DiaryYearList = ({navigation}: any) => {
     return uris;
   };
   const renderBookCover = () => {
-    const renderImageList = ({item, index}: any) => {
+    const renderImageList = ({item}: any) => {
       return (
         <View
           style={{

@@ -5,14 +5,13 @@ import {
   TextInput,
   View,
   Alert,
-  StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
 
 import {useDispatch, useSelector} from 'react-redux';
 import {changedDatabaseAction} from '../store/databaseChanges';
-import {COLORS, FONTS, SIZES, icons, theme} from '../constants';
+import {COLORS, FONTS, SIZES} from '../constants';
 
 import * as Keychain from 'react-native-keychain';
 import jwt from 'react-native-pure-jwt';
@@ -77,7 +76,7 @@ const Login = ({navigation}: any) => {
       }); // possible errors
   };
   const setKeychain = async (userToken: any) => {
-    const dd = await Keychain.setGenericPassword(name, userToken);
+    await Keychain.setGenericPassword(name, userToken);
     setLoading(false);
     dispatch(changedDatabaseAction.updateUserName(name));
     navigation.replace('DiaryYearList');
@@ -352,7 +351,5 @@ const Login = ({navigation}: any) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({});
 
 export default Login;

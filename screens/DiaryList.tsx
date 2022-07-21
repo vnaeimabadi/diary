@@ -23,9 +23,9 @@ const PLACE_ITEM_SIZE =
 let firstUpdate = true;
 let firstAdd = true;
 let firstDelete = true;
-const DiaryList = ({navigation, route}) => {
+const DiaryList = ({navigation, route}: any) => {
   const yearId = route.params.yearId;
-  const [diaryList, setDiaryList] = useState([]);
+  const [diaryList, setDiaryList] = useState<any>([]);
   const isDeleted = useRef(false);
   const isEmptyList = useRef(false);
   const flatListRef = useRef();
@@ -38,12 +38,12 @@ const DiaryList = ({navigation, route}) => {
   const addNewDiaryHandler = () => {
     navigation.navigate('AddEditDiary', {yearId: yearId});
   };
-  const singleDiaryHandler = id => {
+  const singleDiaryHandler = (id: any) => {
     isDeleted.current = true;
     navigation.navigate('DiaryDetail', {id: id, yearId: yearId});
   };
 
-  const reloadData = scrollToTop => {
+  const reloadData = (scrollToTop: any) => {
     queryDiaryListsById(yearId)
       .then(data => {
         if (data.length > 0) {
@@ -156,7 +156,7 @@ const DiaryList = ({navigation, route}) => {
   };
 
   const renderDiaryList = () => {
-    const renderItem = ({item, index}) => {
+    const renderItem = ({item}: any) => {
       const longDate =
         item.createdTs.toString().split(' ')[0] +
         ' ' +

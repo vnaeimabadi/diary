@@ -27,7 +27,7 @@ import {COLORS, FONTS, SIZES, icons} from '../constants';
 import Gallery from './component/Gallery';
 import MyImagePicker from './component/MyImagePicker';
 
-const AddEditDiary = ({navigation, route}) => {
+const AddEditDiary = ({navigation, route}: any) => {
   const yearId = route.params.yearId;
   const p_date = route.params.date;
 
@@ -48,7 +48,7 @@ const AddEditDiary = ({navigation, route}) => {
   const [titleError, setTitleError] = useState(false);
   const [details, setDetails] = useState(editedContent);
   const [detailsError, setDetailsError] = useState(false);
-  const [dateError, setDateError] = useState(null);
+  const [dateError, setDateError] = useState<boolean | null>(null);
   const [height, setHeight] = useState(0);
 
   const [visibleImagePicker, setVisibleImagePicker] = useState(false);
@@ -74,7 +74,7 @@ const AddEditDiary = ({navigation, route}) => {
     setDatePickerVisibility(false);
   };
 
-  const confirmHandler = date => {
+  const confirmHandler = (date: any) => {
     if (dateError) setDateError(false);
     setDatePickerDate(date);
     hideDatePickerHandler();
@@ -151,7 +151,7 @@ const AddEditDiary = ({navigation, route}) => {
       });
   };
 
-  const addNewDiary = id => {
+  const addNewDiary = (id: any) => {
     let newId = Math.floor(Date.now() / 1000);
 
     let date =
@@ -164,7 +164,7 @@ const AddEditDiary = ({navigation, route}) => {
     let addImages = [];
 
     if (images.length > 0) {
-      addImages = images.map((item, index) => {
+      addImages = images.map((item: any) => {
         return {
           id: item.id,
           path: item.uri,
@@ -188,7 +188,7 @@ const AddEditDiary = ({navigation, route}) => {
     };
 
     insertDiaryToDiaryList(id, newDiaryContent)
-      .then(data => {
+      .then(() => {
         if (newYearAdded) {
           dispatch(changedDatabaseAction.diaryYearChanged());
         }
@@ -205,7 +205,7 @@ const AddEditDiary = ({navigation, route}) => {
     let addImages = [];
 
     if (images.length > 0) {
-      addImages = images.map((item, index) => {
+      addImages = images.map((item: any) => {
         return {
           id: item.id,
           path: item.uri,
@@ -234,7 +234,7 @@ const AddEditDiary = ({navigation, route}) => {
     };
 
     updateDiaryList(yearId, updateDiaryContent, selectedIndex)
-      .then(data => {
+      .then(() => {
         dispatch(changedDatabaseAction.singleDiaryEditedChanged());
         navigation.goBack();
       })
@@ -244,7 +244,7 @@ const AddEditDiary = ({navigation, route}) => {
       });
   };
 
-  const deleteImageDialogBox = id =>
+  const deleteImageDialogBox = (id: any) =>
     Alert.alert('Delete Image', 'Are your sure you want to delete image?', [
       {
         text: 'Cancel',
@@ -253,8 +253,8 @@ const AddEditDiary = ({navigation, route}) => {
       {text: 'delete', onPress: () => deleteImage(id)},
     ]);
 
-  const deleteImage = id => {
-    let temp = images.filter((data, index) => {
+  const deleteImage = (id: any) => {
+    let temp = images.filter((data: any) => {
       return data.id != id;
     });
 
@@ -264,7 +264,7 @@ const AddEditDiary = ({navigation, route}) => {
   const closeHandler = () => {
     setVisibleImagePicker(false);
   };
-  const addImageHandler = data => {
+  const addImageHandler = (data: any) => {
     let newId = Math.floor(Date.now() / 1000);
     let temp = [...images];
     temp.push({
@@ -560,7 +560,7 @@ const AddEditDiary = ({navigation, route}) => {
   };
 
   const renderImages = () => {
-    const renderImageList = ({item, index}) => {
+    const renderImageList = ({item, index}: any) => {
       return (
         <View
           style={{
@@ -646,18 +646,20 @@ const AddEditDiary = ({navigation, route}) => {
             {
               height: Math.max(35, height),
               maxHeight: SIZES.height / 1.5,
+              padding: 10,
             },
           ]}
           placeholder="Tell your story..."
           placeholderTextColor={COLORS.black}
           selectionColor={COLORS.gray}
           onChangeText={value => {
-            if (detailsError) setDetailsError(false);
+            if (detailsError) {
+              setDetailsError(false);
+            }
             setDetails(value);
           }}
           value={details}
           autoFocus={true}
-          style={{padding: 10}}
           underlineColorAndroid={detailsError ? COLORS.red : COLORS.darkBlue}
           onContentSizeChange={e => {
             setHeight(e.nativeEvent.contentSize.height);
@@ -762,7 +764,7 @@ const AddEditDiary = ({navigation, route}) => {
       {/* {visibleImagePicker ? renderImagePicker() : null} */}
       {visibleImagePicker ? (
         <MyImagePicker
-          addImage={img => addImageHandler(img)}
+          addImage={(img: any) => addImageHandler(img)}
           close={closeHandler}
         />
       ) : null}

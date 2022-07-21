@@ -54,7 +54,7 @@ const MyImagePicker = props => {
                     // setImages(temp);
                     // setVisibleImagePicker(false);
                   })
-                  .catch(e => {
+                  .catch((e: any) => {
                     console.log('e-temp');
                   });
               }}

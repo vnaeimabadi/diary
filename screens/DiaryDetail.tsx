@@ -17,7 +17,7 @@ import {changedDatabaseAction} from '../store/databaseChanges';
 import {COLORS, FONTS, SIZES, icons} from '../constants';
 import Gallery from './component/Gallery';
 
-const DiaryDetail = ({navigation, route}) => {
+const DiaryDetail = ({navigation, route}: any) => {
   const id = route.params.id;
   const yearId = route.params.yearId;
 
@@ -36,7 +36,7 @@ const DiaryDetail = ({navigation, route}) => {
     queryDiaryListsById(yearId)
       .then(data => {
         // setDiaryList(data);
-        let dd = data[0].diaries.filter((da, index) => {
+        let dd = data[0].diaries.filter((da: any, index: any) => {
           if (da.id === id) {
             selectedIndex.current = index;
             // return da.id == id;
@@ -57,9 +57,9 @@ const DiaryDetail = ({navigation, route}) => {
   };
 
   const editDearyHandler = () => {
-    let temp = [];
+    let temp: any = [];
     if (images != null && images.length > 0) {
-      images.map((item, index) => {
+      images.map((item: any) => {
         temp.push({id: item.id, uri: item.path, mime: ''});
       });
     }
@@ -86,7 +86,7 @@ const DiaryDetail = ({navigation, route}) => {
   const deleteDearyHandler = () => {
     //
     deleteSingleDiary(yearId, selectedIndex.current)
-      .then(data => {
+      .then(() => {
         dispatch(changedDatabaseAction.singleDiaryDeleted());
         navigation.goBack();
       })
@@ -178,7 +178,7 @@ const DiaryDetail = ({navigation, route}) => {
   };
 
   const renderImages = () => {
-    const renderImageList = ({item, index}) => {
+    const renderImageList = ({item, index}: any) => {
       return (
         <View
           style={{

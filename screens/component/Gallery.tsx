@@ -17,7 +17,7 @@ const Gallery = () => {
   };
 
   const renderImages = () => {
-    const renderImageList = ({item, index}) => {
+    const renderImageList = ({item, index}: any) => {
       return (
         <View
           style={{
@@ -63,7 +63,7 @@ const Gallery = () => {
       selectedImage != ''
     )
       setTimeout(() => {
-        flatListRef.current.scrollToIndex({
+        flatListRef?.current.scrollToIndex({
           index: selectedImage,
           animated: true,
         });
