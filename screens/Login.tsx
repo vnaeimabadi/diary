@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
+import {useMachine} from '@xstate/react';
 
 import {useDispatch, useSelector} from 'react-redux';
 import {changedDatabaseAction} from '../store/databaseChanges';
@@ -15,8 +16,32 @@ import {COLORS, FONTS, SIZES} from '../constants';
 
 import * as Keychain from 'react-native-keychain';
 import jwt from 'react-native-pure-jwt';
+import {diaryMachine} from '../src/machines/diaryMachine';
+interface InputProps {
+  label: string;
+  placeHolder: string;
+  isError: boolean;
+  value: string;
+  onFocus: () => void;
+  onChangeText: (text: string) => void;
+  editable: boolean;
+  style?: any;
+  secureTextEntry?: boolean;
+  errorMessage: string;
+}
 
 const Login = ({navigation}: any) => {
+  const [state, send] = useMachine(diaryMachine, {
+    services: {
+      checkUserStatus: async () => {
+        const credentials = await Keychain.getGenericPassword();
+        return credentials === false
+          ? {registered: false}
+          : {registered: true, ...credentials};
+      },
+    },
+  });
+
   const dispatch = useDispatch();
   const userName = useSelector(status => status.userName);
 
@@ -25,37 +50,57 @@ const Login = ({navigation}: any) => {
   const [nameError, setNameError] = useState(false);
   const [password, setPassword] = useState('');
   const [passwordError, setPasswordError] = useState(false);
-  const [firstTime, setFirstTime] = useState<Boolean | null>(null);
+  const [firstTime, setFirstTime] = useState<Boolean | null>(false);
 
   const updateName = (value: any) => {
-    setName(value);
-    if (nameError) setNameError(false);
+    // setName(value);
+    // if (nameError) {
+    //   setNameError(false);
+    // }
+    send({
+      type: 'change username',
+      value: value,
+    });
   };
 
   const updatePassword = (value: any) => {
-    setPassword(value);
-    if (passwordError) setPasswordError(false);
+    // setPassword(value);
+    // if (passwordError) {
+    //   setPasswordError(false);
+    // }
+    send({
+      type: 'change password',
+      value: value,
+    });
   };
 
   const registerHandler = async () => {
+    // send({
+    //   type: 'error userName',
+    //   value: true,
+    // });
+    // if (true) {
+    //   return;
+    // }
+    if (loading) {
+      return;
+    }
+
     let canContinue = true;
-    if (name == null || name == '') {
+
+    if (!Boolean(name)) {
       canContinue = false;
       setNameError(true);
-    } else {
-      if (nameError) setNameError(false);
     }
 
-    if (password == null || password == '') {
+    if (!Boolean(password)) {
       canContinue = false;
       setPasswordError(true);
-    } else {
-      if (passwordError) setPasswordError(false);
     }
 
-    if (!canContinue) return;
-
-    if (loading) return;
+    if (!canContinue) {
+      return;
+    }
 
     setLoading(true);
     jwt
@@ -69,13 +114,13 @@ const Login = ({navigation}: any) => {
         },
       )
       .then((token: any) => {
-        setKeychain(token);
+        setKeyChain(token);
       }) // token as the only argument
-      .catch((err: any) => {
+      .catch(() => {
         setLoading(false);
       }); // possible errors
   };
-  const setKeychain = async (userToken: any) => {
+  const setKeyChain = async (userToken: any) => {
     await Keychain.setGenericPassword(name, userToken);
     setLoading(false);
     dispatch(changedDatabaseAction.updateUserName(name));
@@ -84,14 +129,17 @@ const Login = ({navigation}: any) => {
 
   const checkUserStatus = async () => {
     try {
-      if (password == null || password == '') {
-        setPasswordError(true);
+      if (loading) {
         return;
-      } else {
-        if (passwordError) setPasswordError(false);
       }
 
-      if (loading) return;
+      if (!Boolean(password)) {
+        setPasswordError(true);
+        return;
+      }
+      if (passwordError) {
+        setPasswordError(false);
+      }
 
       setLoading(true);
       const credentials = await Keychain.getGenericPassword();
@@ -108,14 +156,14 @@ const Login = ({navigation}: any) => {
         )
         .then((token: any) => {
           setLoading(false);
-          if (credentials.password == token) {
+          if (credentials.password === token) {
             navigation.replace('DiaryYearList');
           } else {
             Alert.alert('Wrong Password', '', [{text: 'ok'}]);
             // console.log('wrong password');
           }
         }) // token as the only argument
-        .catch((err: any) => {
+        .catch(() => {
           setLoading(false);
         });
     } catch (error) {
@@ -128,7 +176,7 @@ const Login = ({navigation}: any) => {
     try {
       const credentials = await Keychain.getGenericPassword();
       // removeCredentials()
-      if (credentials.password == undefined) {
+      if (!Boolean(credentials.password)) {
         setFirstTime(true);
       } else {
         setFirstTime(false);
@@ -141,14 +189,14 @@ const Login = ({navigation}: any) => {
 
   const removeCredentials = async () => {
     try {
-      const credentials = await Keychain.resetGenericPassword();
+      await Keychain.resetGenericPassword();
       // console.log(JSON.parse(credentials));
     } catch (error) {
       console.log("Keychain couldn't be accessed!", error);
     }
   };
 
-  const renderMainContent = (title: any, isRegister = false) => {
+  const renderMainContent = (title: string, isRegister = false) => {
     const renderLoginButton = () => {
       return (
         <TouchableOpacity onPress={checkUserStatus}>
@@ -188,53 +236,30 @@ const Login = ({navigation}: any) => {
         </TouchableOpacity>
       );
     };
-
-    const renderName = () => {
+    const renderInputs = (inputProps: InputProps) => {
       return (
         <View>
           <TextInput
-            editable={isRegister ? true : false}
+            editable={inputProps.editable}
             style={{
-              borderBottomColor: nameError ? COLORS.red : COLORS.darkBlue,
+              borderBottomColor: inputProps.isError
+                ? COLORS.red
+                : COLORS.darkBlue,
               borderBottomWidth: 1,
               height: 40,
               color: COLORS.black,
               ...FONTS.body3,
+              ...inputProps.style,
             }}
-            // secureTextEntry={isRegister ? false : true}
-            placeholder="Name"
-            value={name}
-            onChangeText={value => updateName(value)}
+            secureTextEntry={inputProps.secureTextEntry}
+            placeholder={inputProps.placeHolder}
+            value={inputProps.value}
+            onFocus={inputProps.onFocus}
+            onChangeText={inputProps.onChangeText}
           />
-          {nameError ? (
+          {inputProps.isError ? (
             <Text style={{marginLeft: 0, marginTop: 0, color: COLORS.red}}>
-              please enter name
-            </Text>
-          ) : null}
-        </View>
-      );
-    };
-
-    const renderPassword = () => {
-      return (
-        <View>
-          <TextInput
-            style={{
-              marginTop: 20,
-              borderBottomColor: passwordError ? COLORS.red : COLORS.darkBlue,
-              borderBottomWidth: 1,
-              height: 40,
-              color: COLORS.black,
-              ...FONTS.body3,
-            }}
-            secureTextEntry={true}
-            placeholder="Password"
-            value={password}
-            onChangeText={value => updatePassword(value)}
-          />
-          {passwordError ? (
-            <Text style={{marginLeft: 0, marginTop: 0, color: COLORS.red}}>
-              please enter password
+              {inputProps.errorMessage}
             </Text>
           ) : null}
         </View>
@@ -256,11 +281,18 @@ const Login = ({navigation}: any) => {
       );
     };
 
-    const renderTitle = (title: any) => {
+    const renderTitle = (_title: string) => {
       return (
         <View
           style={{position: 'absolute', elevation: 5, top: 16, left: '20%'}}>
-          <Text style={{color: COLORS.lightYellow, ...FONTS.h2}}>{title}</Text>
+          <Text
+            style={{
+              color: COLORS.lightYellow,
+              textTransform: 'uppercase',
+              ...FONTS.h2,
+            }}>
+            {_title}
+          </Text>
         </View>
       );
     };
@@ -279,8 +311,28 @@ const Login = ({navigation}: any) => {
             padding: 20,
             justifyContent: 'center',
           }}>
-          {renderName()}
-          {renderPassword()}
+          {renderInputs({
+            label: 'Please enter user name',
+            placeHolder: 'UserName',
+            isError: nameError,
+            value: state.context.userName,
+            onFocus: () => {},
+            onChangeText: value => updateName(value),
+            editable: isRegister ? true : false,
+            errorMessage: '',
+          })}
+          {renderInputs({
+            label: 'Please enter password',
+            placeHolder: 'Password',
+            isError: passwordError,
+            value: state.context.password,
+            onFocus: () => {},
+            onChangeText: value => updatePassword(value),
+            editable: true,
+            style: {marginTop: 20},
+            secureTextEntry: true,
+            errorMessage: '',
+          })}
         </View>
       );
     };
@@ -312,15 +364,8 @@ const Login = ({navigation}: any) => {
         }}>
         <ScrollView
           contentContainerStyle={{
-            // padding: 12,
             justifyContent: 'center',
           }}>
-          {/* <Text style={{fontSize: 27}}>{title}</Text>
-          {renderName()}
-          {renderPassword()}
-          <View style={{margin: 7}} />
-          {isRegister ? renderRegisterButton() : renderLoginButton()} */}
-
           {renderLeftSideBox()}
           {renderTitle(title)}
           {renderContent()}
@@ -330,9 +375,26 @@ const Login = ({navigation}: any) => {
     );
   };
 
+  // useEffect(() => {
+  //   checkLoginStatus();
+  // }, []);
+
   useEffect(() => {
-    checkLoginStatus();
-  }, []);
+    console.log('state.value===>', state.value);
+    console.log('state.context===>', state.context);
+  }, [state]);
+
+  useEffect(() => {
+    if (state.matches('show register component')) {
+      send({
+        type: 'register',
+      });
+    } else if (state.matches('show login component')) {
+      send({
+        type: 'login',
+      });
+    }
+  }, [state.value]);
 
   return (
     <View
@@ -343,11 +405,11 @@ const Login = ({navigation}: any) => {
         flex: 1,
         width: '100%',
       }}>
-      {firstTime == null
-        ? null
-        : firstTime == true
-        ? renderMainContent('Register', true)
-        : renderMainContent('Login')}
+      {
+        // state.matches('show register component') &&
+        renderMainContent('Register', true)
+      }
+      {state.matches('show login component') && renderMainContent('Login')}
     </View>
   );
 };

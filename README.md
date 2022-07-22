@@ -53,3 +53,9 @@
 <img src="./assets/app-images/app-23.png" width="180" height="300">
 <img src="./assets/app-images/app-24.png" width="180" height="300">
 <img src="./assets/app-images/app-25.png" width="180" height="300">
+
+#### check login status
+
+  * success: show login page
+    * aa
+  * error: show register page 
