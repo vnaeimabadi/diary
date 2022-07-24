@@ -38,6 +38,8 @@ export interface Typegen0 {
     | 'finishedBackup'
     | 'restoreDiaryList'
     | 'finishRestoring'
-    | 'diaryFlow';
+    | 'diaryFlow'
+    | 'errorGettingBackup'
+    | 'errorRestoring';
   tags: never;
 }

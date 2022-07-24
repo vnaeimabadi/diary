@@ -1,7 +1,7 @@
 import {assign, createMachine} from 'xstate';
 
 export const diaryMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QQJYEMBOBPABAWzQGMALFAOzADoAbAezVTKgBF1sAZFWAFwGIJaFSuQButANZVUmXARLkqdBuRZssnHglG1CabikEBtAAwBdRKAAOtWCn2CLIAB6IATAHZjlAKzGAHACcrgCMxgDMAcbefn4AbAA0IFiIALTB3gAslBkescbhIX7usWF+AL5lidLY+ESkQtXqXNzs9BCQvABCAIIAwgDSACoA8gCSAHKjg6Pd7I7WtvZkji4IsVnBxZsBfiEergHBickIKe7ulMHBGbEBJe7ert7exRVVarXyQgBGROIArpZWDINHwBEJtJJKI1PvUqL9CACgWpQVoyGJdEsTOYkCAFnYDMtcasUt5YhdybFQu5gmFYiVSsdUldXNlgjFjO4wmF3AEdrc3iAYXI4ZQAGbkLjESCdP6Arp9IZjSbTWbzGwEhzE1LcrzGDIRYKuHKuQK7JmnMk+ULeYIBCJ3Z4ZcqVIUfEUKSgYODcWje4EcZr8QRUSFSd11T3enh+sABpqabSYwnY9WLQkrRBBHw5fIZYJ5Pz6vwW9KxSh042lfx+W23dyC4WRoQSshSgBKPr9KgVAxGEymMzmuPxS0zp1cT0oBzC3jpdNroSiFoNlDiLxKj1iTqpjYjX3DMgAYnQAO68ZgzdsATXYowAyoM05qiaASQ8K5FDrdJ65Sn4wgtFJjQ2QJjCuI04kCW09xkWFPUaE9aHPdsAFFH2GNDnzHbVTiuLwwmMAIHgiCIQkeICwmnc56S5WIYhyIp3FcWCag9Bo1CQ88egGABVAAFbCM1wlIwgyLwdhpQIwknbkAgyIC-wCS4MgyIJbnWOcG0FMhaHaeBcSbA8aDaFR41BIStTfLMNno2l11uKIqUU4pLjA8CAINYiWNdIzRUaUFWgYSBLNfZw3EyNc8m3J5zhiZj3CAudKA0v8aWI6IPAeVjZGbeE5WREFmlC8dST8YJp02cCgiLYi7kUjILgNB0qVU9w4n8HL4JbSVYGlCBZURQESpEl4qNccljCrQ5vHtBIklSZTzmKdYDn8Uowk2Lr2KoaNfX9FFipHDUcOs04qLpTkxtNIoeVmksFoQblsnJb9nk8Wdrm2vLxV64hOxjDAVBGs60j5FLok24s1P1G5SzUqKQKuelHnSMJvuMxCzxB8K8PKtcAheHY-AyXweTiID8LXUnXGMWJYvcRrZwxuEcZJPJvEqzw7VNIjeXmk5RIR9lIjp8r8jAjIKgqIA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QQJYEMBOBPABAWzQGMALFAOzADoAbAezVTKgBF1sAZFWAFwGIJaFSuQButANZVUmXARLkqdBuRZssnHglG1CabikEBtAAwBdRKAAOtWCn2CLIAB6IATAA4AnJQDsX4wAsAKwAbADMHiEAjK5BADQgWIgAtFEhQZTpxj5BUZ4hngFRYT4hAL5lCdLY+ESkQtXqXNzs9BCQvABCAIIAwgDSACoA8gCSAHKjg6Pd7I7WtvZkji4IURlhAZ6ergXuJa4BIe4hCUkIqYeUnmGeQWGh22FhxtkVVWq18kIARkTiAFdLKwZBo+AIhNpJJRGl96lQ-oRAcC1GCtGQxLoliZzEgQAs7AZlnjVskQoFru4AmF3KUgq5CiUzikohTNvT1gdPD4fDF3iBYXJ4ZREciQRxmrwwBgMLQMJRLNQ9AAzOV4GGfIUKEX-IHipqabRYok4+Y2QkOEkpPaUWnGIKhXLZdxRZkXMKUVw8kJ+YzuemxAIunz8wV1bXK8hcYiQTq6yxdPpDMaTaazM2LIkrFK3VyZIonKnGMJRALZMJu1JHSjrbLRHzcu5HUOa8NCDBwbhysD6sH8QRUKFSVvfKgdnjd3vNdGYvQmswZi3E0CrQqenyuYw+4v3F0Ot2uCKektpfY8nYM9wtmRw7Xjrsdqc8KUyuUKpXcVUYdVh0eUe+Tqi05GnORgLniBJLNmFy7JQRQMkEASuIGQTcj4bpRC6cHUoUQZekURwBNeNRakIkZkNGABKnZyioiYDCMExTDMcwQeaUFWjBsSejc9zhMcTr2m61K2ukpQPLsDpHFExGyG2w4yAAYnQADuvDMDMlEAJrsKMADKgyLhxK4pDklC3MYnhpBeh7uPslaHAENb+FErmRF4uSybeDRqMptBqZRACiBnDEFRlZpxQTuJ6gR+lshzRFurqJIg3hPH6fhhAUZYBCGlQCiOwqNH5ak9AMACqAAK4WWiZ7plpSvJeBEh63AEDm3DWATxQUITBCUXmkVQ0qyhgADiYDcPoTBxkiQL0cmTFpqxVjsRFdXJOyvi5D4xi1i8rwVilME+PmuUeLt6TdYEeUfDeQ2UCNcrUROGB0WVi2pixNXLs4LKYeZISuMU-rIeEu3xMdyTeHZfghMcHi5UEgQVPlZC0O08B4r+wpKIwqigs0P3QWup4g+kBT2tEDmlM5nivJhmy3Bug3yRqhM8K0DCQMTnGBqJW70kEPKw16lb3Jk+SHry3JRV6OSs3+op6kBPC8xtUVRJ6US7XkHiWQ2pxQ4cp3Urc+SlrlJx+orwrkdGsbxurf0XAGcElDSBs+DS7VQ8j5lFKWQN2fSngurbd40Y+qvcM7qybsYMXels9xHMcvvnEevI+s83W5ntV75TjEZRrAxAvQ+Khxykhxa1lyG0ibcVAxhxxdayuRNqy3URz5SmqdXFyYVrHkNnZwTFnDlauYnVL0lusQ8rlDy98Nr7jZN01QLNyKD8kDrRYHDxU+k6zocdu2UJZdknOeVnA0RReFdqT0YBXtFMHvWHFOTdI+gGborKUFyLDNI3ssqT1XnvDceY7QOlPs6ZK5xNpbDpq8I4XhtjGFcKjMoQA */
   createMachine(
     {
       context: {diaryList: []},
@@ -69,6 +69,11 @@ export const diaryMachine =
                 target: 'finishedBackup',
               },
             ],
+            onError: [
+              {
+                target: 'errorGettingBackup',
+              },
+            ],
           },
         },
         finishedBackup: {
@@ -84,6 +89,11 @@ export const diaryMachine =
             onDone: [
               {
                 target: 'finishRestoring',
+              },
+            ],
+            onError: [
+              {
+                target: 'errorRestoring',
               },
             ],
           },
@@ -105,6 +115,20 @@ export const diaryMachine =
             },
             BACKUP: {
               target: 'backupDiaryList',
+            },
+          },
+        },
+        errorGettingBackup: {
+          on: {
+            BACKTOINITIAL: {
+              target: 'diaryFlow',
+            },
+          },
+        },
+        errorRestoring: {
+          on: {
+            BACKTOINITIAL: {
+              target: 'diaryFlow',
             },
           },
         },

@@ -10,82 +10,80 @@ import {
 import uuid from 'react-native-uuid';
 
 const backup_database = async () => {
-  try {
-    const data = await queryAllDiaryLists();
-    if (data.length > 0) {
-      var currentdate = new Date();
-      var datetime =
-        currentdate.getDate() +
-        '-' +
-        (currentdate.getMonth() + 1) +
-        '-' +
-        currentdate.getFullYear() +
-        '_' +
-        currentdate.getHours() +
-        '-' +
-        currentdate.getMinutes() +
-        '-' +
-        currentdate.getSeconds();
+  const data = await queryAllDiaryLists();
 
-      const permissionResult = await requestMultiple([
-        PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-        PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-      ]);
+  if (data.length > 0) {
+    var currentDate = new Date();
 
-      const response = await RNFS.writeFile(
-        RNFS.ExternalStorageDirectoryPath +
-          '/diary_backup_' +
-          datetime +
-          '.txt',
-        JSON.stringify(data),
-        'utf8',
-      );
+    var dateTime =
+      currentDate.getDate() +
+      '-' +
+      (currentDate.getMonth() + 1) +
+      '-' +
+      currentDate.getFullYear() +
+      '_' +
+      currentDate.getHours() +
+      '-' +
+      currentDate.getMinutes() +
+      '-' +
+      currentDate.getSeconds();
 
-      alert(
-        'Backup successfully created!\n' + '/diary_backup_' + datetime + '.txt',
-      );
-    }
-  } catch (e) {
-    alert('Error on creating backup!');
+    await requestMultiple([
+      PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+      PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+    ]);
+
+    await RNFS.writeFile(
+      RNFS.ExternalStorageDirectoryPath + '/diary_backup_' + dateTime + '.txt',
+      JSON.stringify(data),
+      'utf8',
+    );
+
+    // alert(
+    //   'Backup successfully created!\n' + '/diary_backup_' + dateTime + '.txt',
+    // );
+  } else {
+    throw new Error('empty database');
   }
 };
 
 const restore_database = async () => {
   // Pick a single file
-  try {
-    const res = await DocumentPicker.pick({
-      type: [DocumentPicker.types.plainText],
+  // try {
+  const res = await DocumentPicker.pick({
+    type: [DocumentPicker.types.plainText],
+  });
+  // console.log(
+  //   res.uri,
+  //   res.type, // mime type
+  //   res.name,
+  //   res.size,
+  // );
+
+  var restore_data = await RNFS.readFile(res.uri, 'utf8');
+
+  const diaries = JSON.parse(restore_data);
+  if (diaries.length > 0) {
+    await deleteAllDiaryLists();
+
+    diaries.map((item, index) => {
+      addEachDiary(item);
     });
-    // console.log(
-    //   res.uri,
-    //   res.type, // mime type
-    //   res.name,
-    //   res.size,
-    // );
 
-    var restore_data = await RNFS.readFile(res.uri, 'utf8');
+    // alert('Database successfully restored!\n *please re-open application*');
 
-    const diaries = JSON.parse(restore_data);
-    if (diaries.length > 0) {
-      await deleteAllDiaryLists();
-
-      diaries.map((item, index) => {
-        addEachDiary(item);
-      });
-
-      alert('Database successfully restored!\n *please re-open application*');
-
-      return true;
-    } else {
-      alert('Please select correct restore file!');
-    }
-  } catch (err) {
-    if (DocumentPicker.isCancel(err)) {
-      // User cancelled the picker, exit any dialogs or menus and move on
-    } else {
-      throw err;
-    }
+    // return true;
+  } else {
+    throw new Error('');
+    // alert('Please select correct restore file!');
   }
+  // } catch (err) {
+  //   if (DocumentPicker.isCancel(err)) {
+  //     // User cancelled the picker, exit any dialogs or menus and move on
+  //   } else {
+  //     throw err;
+  //   }
+  // }
 };
 
 const addEachDiary = async data => {

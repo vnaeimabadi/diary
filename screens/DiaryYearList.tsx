@@ -15,7 +15,6 @@ import {useSelector} from 'react-redux';
 import {updateDiaryYearImage} from '../database/allSchemas';
 
 import {icons, FONTS, SIZES, COLORS} from '../constants/index';
-import {backup_database, restore_database} from './helper/backupRestore';
 import {useDiaryMachine} from '../src/hooks/machines/use-diaryMachine';
 
 const PLACE_ITEM_SIZE =
@@ -121,10 +120,11 @@ const DiaryYearList = ({navigation, route}: any) => {
   };
 
   const restore = async () => {
-    const isTrue = await restore_database();
-    if (isTrue) {
-      reloadData();
-    }
+    send({type: 'RESTORE'});
+    // const isTrue = await restore_database();
+    // if (isTrue) {
+    //   reloadData();
+    // }
   };
 
   const renderAddStoryButton = () => {
@@ -207,7 +207,7 @@ const DiaryYearList = ({navigation, route}: any) => {
           alignContent: 'center',
         }}>
         <TouchableOpacity
-          onPress={() => backup_database(send)}
+          onPress={() => send({type: 'BACKUP'})}
           style={{
             justifyContent: 'center',
             alignItems: 'center',
@@ -542,10 +542,14 @@ const DiaryYearList = ({navigation, route}: any) => {
 
   const updateState =
     state.matches('finishedBackup') ||
+    state.matches('errorGettingBackup') ||
+    state.matches('errorRestoring') ||
     state.matches('finishRestoring') ||
     state.matches('diaryListLoaded');
 
   useEffect(() => {
+    console.log('updateState', updateState, isFirstTime);
+
     if (isFirstTime) {
       isFirstTime = false;
       send({
@@ -554,9 +558,24 @@ const DiaryYearList = ({navigation, route}: any) => {
       return;
     }
     if (updateState) {
-      send({
-        type: 'BACKTOINITIAL',
-      });
+      if (
+        state.matches('errorGettingBackup') ||
+        state.matches('errorRestoring')
+      ) {
+        setTimeout(() => {
+          send({
+            type: 'BACKTOINITIAL',
+          });
+        }, 3000);
+      } else if (state.matches('finishRestoring')) {
+        send({
+          type: 'DIARYLIST',
+        });
+      } else {
+        send({
+          type: 'BACKTOINITIAL',
+        });
+      }
     }
   }, [updateState]);
   // useEffect(() => {
@@ -593,6 +612,26 @@ const DiaryYearList = ({navigation, route}: any) => {
       ) : null} */}
 
       {visibleImagePicker ? renderBookCover() : null}
+      {(state.matches('errorGettingBackup') ||
+        state.matches('errorRestoring')) && (
+        <View
+          style={{
+            position: 'absolute',
+            bottom: 0,
+            left: 0,
+            width: '100%',
+            backgroundColor: 'red',
+            height: 56,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+          <Text style={{color: 'white', fontWeight: 'bold', fontSize: 18}}>
+            {state.matches('errorGettingBackup')
+              ? 'Database is empty'
+              : 'Please select correct restore file!'}
+          </Text>
+        </View>
+      )}
     </View>
   );
 };

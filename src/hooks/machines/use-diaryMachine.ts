@@ -1,5 +1,9 @@
 import {useMachine} from '@xstate/react';
 import {queryAllDiaryLists} from '../../../database/allSchemas';
+import {
+  backup_database,
+  restore_database,
+} from '../../../screens/helper/backupRestore';
 import {diaryMachine} from '../../machines/diaryMachine';
 
 export const useDiaryMachine = () => {
@@ -15,8 +19,12 @@ export const useDiaryMachine = () => {
 
         return finalData;
       },
-      backuping: async () => {},
-      restoring: async () => {},
+      backuping: async () => {
+        await backup_database();
+      },
+      restoring: async () => {
+        await restore_database();
+      },
     },
   });
 
