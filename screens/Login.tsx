@@ -1,22 +1,20 @@
-import React, {useState, useEffect} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import {
   ScrollView,
   Text,
   TextInput,
   View,
-  Alert,
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
 import {useMachine} from '@xstate/react';
 
-import {useDispatch, useSelector} from 'react-redux';
-import {changedDatabaseAction} from '../store/databaseChanges';
 import {COLORS, FONTS, SIZES} from '../constants';
 
 import * as Keychain from 'react-native-keychain';
 import jwt from 'react-native-pure-jwt';
-import {diaryMachine} from '../src/machines/diaryMachine';
+import {loginMachine} from '../src/machines/loginMachine';
+
 interface InputProps {
   label: string;
   placeHolder: string;
@@ -31,175 +29,93 @@ interface InputProps {
 }
 
 const Login = ({navigation}: any) => {
-  const [state, send] = useMachine(diaryMachine, {
+  const [state, send] = useMachine(loginMachine, {
     services: {
-      checkUserStatus: async () => {
-        const credentials = await Keychain.getGenericPassword();
+      checkUserStatus: async context => {
+        const credentials: any = await Keychain.getGenericPassword();
+        console.log('credentials?.username', credentials?.username);
+
+        if (credentials?.username) {
+          context.userName = credentials.username;
+        }
         return credentials === false
-          ? {registered: false}
+          ? {...context.userStatus, registered: false}
           : {registered: true, ...credentials};
+      },
+      register: async ctx => {
+        const userToken = await jwt.sign(
+          {
+            password: ctx.password,
+          },
+          ctx.password, // secret
+          {
+            alg: 'HS256',
+          },
+        );
+        await Keychain.setGenericPassword(ctx.userName, userToken);
+      },
+      login: async ctx => {
+        const userToken = await jwt.sign(
+          {
+            password: ctx.password,
+          },
+          ctx.password, // secret
+          {
+            alg: 'HS256',
+          },
+        );
+        const credentials: any = await Keychain.getGenericPassword();
+        if (credentials?.password !== userToken) {
+          throw new Error('Wrong Password');
+        }
       },
     },
   });
 
-  const dispatch = useDispatch();
-  const userName = useSelector(status => status.userName);
-
-  const [loading, setLoading] = useState(false);
-  const [name, setName] = useState(userName);
-  const [nameError, setNameError] = useState(false);
-  const [password, setPassword] = useState('');
-  const [passwordError, setPasswordError] = useState(false);
-  const [firstTime, setFirstTime] = useState<Boolean | null>(false);
-
   const updateName = (value: any) => {
-    // setName(value);
-    // if (nameError) {
-    //   setNameError(false);
-    // }
     send({
-      type: 'change username',
+      type: 'FILL_USERNAME',
       value: value,
     });
   };
 
   const updatePassword = (value: any) => {
-    // setPassword(value);
-    // if (passwordError) {
-    //   setPasswordError(false);
-    // }
     send({
-      type: 'change password',
+      type: 'FILL_PASSWORD',
       value: value,
     });
   };
 
-  const registerHandler = async () => {
-    // send({
-    //   type: 'error userName',
-    //   value: true,
-    // });
-    // if (true) {
-    //   return;
-    // }
-    if (loading) {
-      return;
+  const loginRegisterHandler = () => {
+    if (state?.context?.userStatus?.registered) {
+      send({
+        type: 'SUBMIT_LOGIN',
+      });
+    } else {
+      send({
+        type: 'SUBMIT_REGISTER',
+      });
     }
-
-    let canContinue = true;
-
-    if (!Boolean(name)) {
-      canContinue = false;
-      setNameError(true);
-    }
-
-    if (!Boolean(password)) {
-      canContinue = false;
-      setPasswordError(true);
-    }
-
-    if (!canContinue) {
-      return;
-    }
-
-    setLoading(true);
-    jwt
-      .sign(
-        {
-          password: password,
-        },
-        password, // secret
-        {
-          alg: 'HS256',
-        },
-      )
-      .then((token: any) => {
-        setKeyChain(token);
-      }) // token as the only argument
-      .catch(() => {
-        setLoading(false);
-      }); // possible errors
-  };
-  const setKeyChain = async (userToken: any) => {
-    await Keychain.setGenericPassword(name, userToken);
-    setLoading(false);
-    dispatch(changedDatabaseAction.updateUserName(name));
-    navigation.replace('DiaryYearList');
   };
 
-  const checkUserStatus = async () => {
-    try {
-      if (loading) {
-        return;
-      }
+  // const removeCredentials = async () => {
+  //   try {
+  //     await Keychain.resetGenericPassword();
+  //     // console.log(JSON.parse(credentials));
+  //   } catch (error) {
+  //     // console.log("Keychain couldn't be accessed!", error);
+  //   }
+  // };
 
-      if (!Boolean(password)) {
-        setPasswordError(true);
-        return;
-      }
-      if (passwordError) {
-        setPasswordError(false);
-      }
-
-      setLoading(true);
-      const credentials = await Keychain.getGenericPassword();
-
-      jwt
-        .sign(
-          {
-            password: password,
-          },
-          password, // secret
-          {
-            alg: 'HS256',
-          },
-        )
-        .then((token: any) => {
-          setLoading(false);
-          if (credentials.password === token) {
-            navigation.replace('DiaryYearList');
-          } else {
-            Alert.alert('Wrong Password', '', [{text: 'ok'}]);
-            // console.log('wrong password');
+  const renderMainContent = () => {
+    const renderSingleButton = ({title}: {title: string}) => {
+      return (
+        <TouchableOpacity
+          disabled={
+            state.matches('login flow.awaitingLogin') ||
+            state.matches('register flow.awaitingRegister')
           }
-        }) // token as the only argument
-        .catch(() => {
-          setLoading(false);
-        });
-    } catch (error) {
-      setLoading(false);
-      Alert.alert(`You don't have access!`, '', [{text: 'ok'}]);
-    }
-  };
-
-  const checkLoginStatus = async () => {
-    try {
-      const credentials = await Keychain.getGenericPassword();
-      // removeCredentials()
-      if (!Boolean(credentials.password)) {
-        setFirstTime(true);
-      } else {
-        setFirstTime(false);
-        dispatch(changedDatabaseAction.updateUserName(credentials.username));
-      }
-    } catch (error) {
-      Alert.alert(`You don't have access!`, '', [{text: 'ok'}]);
-    }
-  };
-
-  const removeCredentials = async () => {
-    try {
-      await Keychain.resetGenericPassword();
-      // console.log(JSON.parse(credentials));
-    } catch (error) {
-      console.log("Keychain couldn't be accessed!", error);
-    }
-  };
-
-  const renderMainContent = (title: string, isRegister = false) => {
-    const renderLoginButton = () => {
-      return (
-        <TouchableOpacity onPress={checkUserStatus}>
+          onPress={loginRegisterHandler}>
           <View
             style={{
               height: '100%',
@@ -207,30 +123,11 @@ const Login = ({navigation}: any) => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            {loading ? (
+            {state.matches('register flow.awaitingRegister') ||
+            state.matches('login flow.awaitingLogin') ? (
               <ActivityIndicator size="small" color={COLORS.white} />
             ) : (
-              <Text style={{color: COLORS.white}}>Login</Text>
-            )}
-          </View>
-        </TouchableOpacity>
-      );
-    };
-
-    const renderRegisterButton = () => {
-      return (
-        <TouchableOpacity onPress={registerHandler}>
-          <View
-            style={{
-              height: '100%',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}>
-            {loading ? (
-              <ActivityIndicator size="small" color={COLORS.white} />
-            ) : (
-              <Text style={{color: COLORS.white}}>Register</Text>
+              <Text style={{color: COLORS.white}}>{title}</Text>
             )}
           </View>
         </TouchableOpacity>
@@ -314,24 +211,29 @@ const Login = ({navigation}: any) => {
           {renderInputs({
             label: 'Please enter user name',
             placeHolder: 'UserName',
-            isError: nameError,
+            isError: state.matches('register flow.userNameErr.too_Short'),
             value: state.context.userName,
             onFocus: () => {},
             onChangeText: value => updateName(value),
-            editable: isRegister ? true : false,
-            errorMessage: '',
+            editable: !state?.context?.userStatus?.registered,
+            errorMessage: 'too short username',
           })}
           {renderInputs({
             label: 'Please enter password',
             placeHolder: 'Password',
-            isError: passwordError,
+            isError:
+              state.matches('login flow.passwordErr.incorrect') ||
+              state.matches('login flow.passwordErr.tooShort') ||
+              state.matches('register flow.passwordErr.tooShort'),
             value: state.context.password,
             onFocus: () => {},
             onChangeText: value => updatePassword(value),
             editable: true,
             style: {marginTop: 20},
             secureTextEntry: true,
-            errorMessage: '',
+            errorMessage: state.matches('login flow.passwordErr.incorrect')
+              ? 'in correct password'
+              : 'too short password',
           })}
         </View>
       );
@@ -350,7 +252,10 @@ const Login = ({navigation}: any) => {
             borderRadius: 5,
             elevation: 5,
           }}>
-          {isRegister ? renderRegisterButton() : renderLoginButton()}
+          {!state?.context?.userStatus?.registered
+            ? renderSingleButton({title: 'Register'})
+            : renderSingleButton({title: 'Login'})}
+          {/* : renderLoginButton()} */}
         </View>
       );
     };
@@ -367,7 +272,9 @@ const Login = ({navigation}: any) => {
             justifyContent: 'center',
           }}>
           {renderLeftSideBox()}
-          {renderTitle(title)}
+          {renderTitle(
+            state?.context?.userStatus?.registered ? 'Login' : 'Register',
+          )}
           {renderContent()}
           {renderButton()}
         </ScrollView>
@@ -376,25 +283,25 @@ const Login = ({navigation}: any) => {
   };
 
   // useEffect(() => {
-  //   checkLoginStatus();
-  // }, []);
+  //   console.log('state.value===>', state.value);
+  //   console.log('state.context===>', state.context);
+  // }, [state]);
 
-  useEffect(() => {
-    console.log('state.value===>', state.value);
-    console.log('state.context===>', state.context);
-  }, [state]);
-
-  useEffect(() => {
-    if (state.matches('show register component')) {
-      send({
-        type: 'register',
-      });
-    } else if (state.matches('show login component')) {
-      send({
-        type: 'login',
-      });
+  const canNavigate =
+    state.matches('register flow.registered') ||
+    state.matches('login flow.loggedIn');
+  const navigateToDiary = useCallback(() => {
+    if (
+      state.matches('register flow.registered') ||
+      state.matches('login flow.loggedIn')
+    ) {
+      navigation.replace('DiaryYearList');
     }
-  }, [state.value]);
+  }, [navigation, state]);
+
+  useEffect(() => {
+    navigateToDiary();
+  }, [canNavigate, navigateToDiary]);
 
   return (
     <View
@@ -405,11 +312,7 @@ const Login = ({navigation}: any) => {
         flex: 1,
         width: '100%',
       }}>
-      {
-        // state.matches('show register component') &&
-        renderMainContent('Register', true)
-      }
-      {state.matches('show login component') && renderMainContent('Login')}
+      {state?.context?.userStatus && renderMainContent()}
     </View>
   );
 };

@@ -13,7 +13,8 @@ import {
 } from './screens';
 
 import store from './store/index';
-
+console.disableYellowBox = true;
+console.warn = () => {};
 const Stack = createStackNavigator();
 const App = () => {
   useEffect(() => {
