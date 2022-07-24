@@ -12,11 +12,11 @@ import {
   BackHandler,
 } from 'react-native';
 import {useSelector} from 'react-redux';
-
-import {queryAllDiaryLists, updateDiaryYearImage} from '../database/allSchemas';
+import {updateDiaryYearImage} from '../database/allSchemas';
 
 import {icons, FONTS, SIZES, COLORS} from '../constants/index';
 import {backup_database, restore_database} from './helper/backupRestore';
+import {useDiaryMachine} from '../src/hooks/machines/use-diaryMachine';
 
 const PLACE_ITEM_SIZE =
   Platform.OS === 'ios' ? SIZES.width / 1.25 : SIZES.width / 1.2;
@@ -25,12 +25,17 @@ const EMPTY_ITEM_SIZE = (SIZES.width - PLACE_ITEM_SIZE) / 2;
 let firstAdd = true;
 
 let covers = ['orang', 'red', 'blue', 'yellow', 'green', 'pink'];
+let isFirstTime = true;
+const DiaryYearList = ({navigation, route}: any) => {
+  const userName = route.params.userName;
+  const {send, state} = useDiaryMachine();
 
-const DiaryYearList = ({navigation}: any) => {
-  const [diaryList, setDiaryList] = useState([]);
+  useEffect(() => {
+    console.log('state.value===>', state.value);
+    console.log('state.context===>', state?.context?.diaryList);
+  }, [state]);
   const diaryScrollX = useRef(new Animated.Value(0)).current;
   const newDiaryYearAdded = useSelector(status => status.diaryYear);
-  const userName = useSelector(status => status.userName);
   const [visibleImagePicker, setVisibleImagePicker] = useState(false);
   const coverImage = useRef('');
   const coverImageYearId = useRef('');
@@ -68,18 +73,18 @@ const DiaryYearList = ({navigation}: any) => {
   };
 
   const reloadData = () => {
-    queryAllDiaryLists()
-      .then((data: any) => {
-        if (data.length > 0) {
-          let dat = [...data].sort((a, b) => b.year - a.year);
-          setDiaryList([{id: -1}, ...dat, {id: -2}]);
-        }
-      })
-      .catch(error => {
-        console.log('error-reload');
-        console.log(error);
-        setDiaryList([]);
-      });
+    // queryAllDiaryLists()
+    //   .then((data: any) => {
+    //     if (data.length > 0) {
+    //       let dat = [...data].sort((a, b) => b.year - a.year);
+    //       setDiaryList([{id: -1}, ...dat, {id: -2}]);
+    //     }
+    //   })
+    //   .catch(error => {
+    //     console.log('error-reload');
+    //     console.log(error);
+    //     setDiaryList([]);
+    //   });
   };
   const renderHeader = () => {
     const renderLogout = () => {
@@ -105,9 +110,9 @@ const DiaryYearList = ({navigation}: any) => {
       <View style={{padding: 20, display: 'flex'}}>
         {renderLogout()}
         <Image style={{width: 50 / 1.3, height: 50}} source={icons.logo} />
-        <Text style={{...FONTS.h3}}>Good morning, {userName}!</Text>
-        <Text style={{...FONTS.h4}}>
-          {diaryList.length > 0
+        <Text style={{...FONTS.h4}}>Good morning, {userName}</Text>
+        <Text style={{...FONTS.h2}}>
+          {state?.context?.diaryList?.length > 0
             ? 'Select Your Diary Year!'
             : 'How Have You Been Today?'}
         </Text>
@@ -202,7 +207,7 @@ const DiaryYearList = ({navigation}: any) => {
           alignContent: 'center',
         }}>
         <TouchableOpacity
-          onPress={backup_database}
+          onPress={() => backup_database(send)}
           style={{
             justifyContent: 'center',
             alignItems: 'center',
@@ -251,7 +256,7 @@ const DiaryYearList = ({navigation}: any) => {
         extrapolate: 'clamp',
       });
 
-      if (index == 0 || index == diaryList.length - 1) {
+      if (index == 0 || index == state?.context?.diaryList?.length - 1) {
         return <View style={{width: EMPTY_ITEM_SIZE}} />;
       } else {
         return (
@@ -354,7 +359,7 @@ const DiaryYearList = ({navigation}: any) => {
 
     return (
       <FlatList
-        data={diaryList}
+        data={state?.context?.diaryList}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
@@ -535,6 +540,29 @@ const DiaryYearList = ({navigation}: any) => {
     );
   };
 
+  const updateState =
+    state.matches('finishedBackup') ||
+    state.matches('finishRestoring') ||
+    state.matches('diaryListLoaded');
+
+  useEffect(() => {
+    if (isFirstTime) {
+      isFirstTime = false;
+      send({
+        type: 'DIARYLIST',
+      });
+      return;
+    }
+    if (updateState) {
+      send({
+        type: 'BACKTOINITIAL',
+      });
+    }
+  }, [updateState]);
+  // useEffect(() => {
+
+  // }, []);
+
   useEffect(() => {
     reloadData();
   }, []);
@@ -551,7 +579,7 @@ const DiaryYearList = ({navigation}: any) => {
   return (
     <View style={styles.container}>
       {renderHeader()}
-      {diaryList.length > 0
+      {state?.context?.diaryList?.length > 0
         ? renderDiaryBookByYear()
         : renderDiaryAddButtonIfEmptyDiaryList()}
       {renderAddStoryButton()}

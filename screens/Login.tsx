@@ -7,13 +7,8 @@ import {
   ActivityIndicator,
   TouchableOpacity,
 } from 'react-native';
-import {useMachine} from '@xstate/react';
-
 import {COLORS, FONTS, SIZES} from '../constants';
-
-import * as Keychain from 'react-native-keychain';
-import jwt from 'react-native-pure-jwt';
-import {loginMachine} from '../src/machines/loginMachine';
+import {useLoginRegisterMachine} from '../src/hooks/machines/use-loginRegisterMachine';
 
 interface InputProps {
   label: string;
@@ -29,48 +24,7 @@ interface InputProps {
 }
 
 const Login = ({navigation}: any) => {
-  const [state, send] = useMachine(loginMachine, {
-    services: {
-      checkUserStatus: async context => {
-        const credentials: any = await Keychain.getGenericPassword();
-        console.log('credentials?.username', credentials?.username);
-
-        if (credentials?.username) {
-          context.userName = credentials.username;
-        }
-        return credentials === false
-          ? {...context.userStatus, registered: false}
-          : {registered: true, ...credentials};
-      },
-      register: async ctx => {
-        const userToken = await jwt.sign(
-          {
-            password: ctx.password,
-          },
-          ctx.password, // secret
-          {
-            alg: 'HS256',
-          },
-        );
-        await Keychain.setGenericPassword(ctx.userName, userToken);
-      },
-      login: async ctx => {
-        const userToken = await jwt.sign(
-          {
-            password: ctx.password,
-          },
-          ctx.password, // secret
-          {
-            alg: 'HS256',
-          },
-        );
-        const credentials: any = await Keychain.getGenericPassword();
-        if (credentials?.password !== userToken) {
-          throw new Error('Wrong Password');
-        }
-      },
-    },
-  });
+  const {state, send} = useLoginRegisterMachine();
 
   const updateName = (value: any) => {
     send({
@@ -295,7 +249,7 @@ const Login = ({navigation}: any) => {
       state.matches('register flow.registered') ||
       state.matches('login flow.loggedIn')
     ) {
-      navigation.replace('DiaryYearList');
+      navigation.replace('DiaryYearList', {userName: state.context.userName});
     }
   }, [navigation, state]);
 
