@@ -4,7 +4,6 @@ export interface Typegen0 {
   '@@xstate/typegen': true;
   eventsCausingActions: {
     assignUserStatusToContext: 'done.invoke.login register machine.check users state:invocation[0]';
-    assignUserStatusErrorToContext: 'error.platform.login register machine.check users state:invocation[0]';
     assignUserNameInputToContext: 'FILL_USERNAME';
     assignPasswordInputToContext: 'FILL_PASSWORD';
   };
@@ -13,10 +12,6 @@ export interface Typegen0 {
       type: 'done.invoke.login register machine.check users state:invocation[0]';
       data: unknown;
       __tip: 'See the XState TS docs to learn how to strongly type this.';
-    };
-    'error.platform.login register machine.check users state:invocation[0]': {
-      type: 'error.platform.login register machine.check users state:invocation[0]';
-      data: unknown;
     };
     'xstate.init': {type: 'xstate.init'};
   };
@@ -32,7 +27,7 @@ export interface Typegen0 {
     delays: never;
   };
   eventsCausingServices: {
-    checkUserStatus: 'try again';
+    checkUserStatus: 'xstate.init';
     register: 'SUBMIT_REGISTER';
     login: 'SUBMIT_LOGIN';
   };
@@ -44,7 +39,6 @@ export interface Typegen0 {
   eventsCausingDelays: {};
   matchesStates:
     | 'check users state'
-    | 'show alert error'
     | 'register flow'
     | 'register flow.show register modal'
     | 'register flow.userNameErr'

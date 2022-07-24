@@ -8,15 +8,10 @@ interface IUserStatus {
   username: string;
 }
 export const loginMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QBsD2UCWA7ABAJzE1gBcw8cBbAQwGMALbMAOnrBoGscBXWM2HElVIBiCKizNsAN1TtmaTLgJFS5avUYs6bTjz4DiQsAmmoaQjOIDaABgC6iUAAdUsDMUtZHIAB6IALP4AbEwAjADMQeEArACcABz+odHhsUEANCAAnogAtKkATEzRoUEFNgWxNqGViQC+dZkK2PiEGCRklLQMElo63Lx4-IIiZHioeExOyEIAZhMUTM1KbR1q3ZqsHAP6I8am5h7W9t4ubkdeSL6IyUXh8QX+AOxxoTYP4U+ZOQi5BdF3coRfw2cIFR5lAoNJroFrKdqqLoaXqwOioADuOCoyDIxBwYwmwmIeCyWKgVGwp1c7k83j8vziTCCT3u8TKKXKTyCoW+eVqYRBBUi0Wiz3icXC0JAy1aKk66h6zHhaxwszQ6KYqIxsoR8tQEGxwgAYgBJAAyZoA+gBVADKAFEAEoAOQAggBZe1U860q703KhGpMBIVNnMsqhJ6hWK837xJgvGyBWKxfwA2IAuJSmXKxEKzS5zpqjGatGYwtqfWG00Wy0ABVdtttAHUAPKOgAi3pp4jpiHCQdC-gzNgS0XisSeaVjf38TGCbJsQWeQQnIPi2dhKzl62RStWiOLGq15YPeoNyGEdqdbs9loAQmbrY7uxc+79UjYwimSvE2X+ARsL5skQDMmAnd5wiTZ4o1XJ5N0UHUVXzXoK1VdVS21NCKCrS9bWte93RNAAVS1HXtABxE1bWIp1X19UB6WSeMniTAp2SeNlSheWMBxCccWTeaI4PiSIELhM9d0VJg0KPTDTx3ShcOEBsmzbTsHyfF8rjOHtLkYxBoijBMninDNwQKP9wljFMmBiNNJ3CZ5x3id5xO3XUpILST0JLPQ8GdKgKDAe08DwY1zSta8XQ9L0dOpN8-UQdimEs8EuX+aIkzXWMIieVKkzSSdRPiUzRPcpC8w2VCfLkqh0QpDwsCgR1CDcNZRHESQsBkOQli3Sr5Wq-dFLqhqaWa1qoHa1QTB6swLGOBx4p9XskoQe45yFOJYk+AoXkiApYziL83heUUuKqYSKuw4aZNqjCnCoWBYHRCYIFC8KaytVSW3bLsVr098oPy6N9uqDMuXHHkQIQUJRPA4dAheN4JyCIJohunyUPkAa5JPHAZRwi8ItrX71IB5wEoY64EF2-LWLeJJLKXcdohnGJTtTFHxQSJzMcaaUBtuvd+sQ-Gy0JgbicNcn-s0596LWgy4eecJUtXIJivh2IhyO2G-iqOzNtHKIam5IIscUnGxZaCXtSJ5T8MIkjLTNVsqOdJX9NpmooNS0San8cFU0+GGfgDIIv3Rqc0yjSMhMtwWc2xu6ZTkp6XrevAPrC0mfsbP7O2999Sks+ch2EypoP8Dn-HjKoIyTHXgjSK3PKRaT04w+rGuwKAzS3TrelMPqU+ttO8Z78amoHrc5pkQ5PFsZaqdWn2mOE2J51XUUnn22JykCXKByYUFyhiUTlxsEok5hRCRa7qeS17ia58UYQCUmaY5gWW2POQpPcW08+7NUHooBeC0LgrxLutZIGM7KlAHKUZuKRYzMhMgUSMDx67xCHNyBogssD6jgN4ceHcbZbF0IMYYhhSCwJVhEUIxR2JYIupCGwN8OZpGKH+UccQ1aBgFvfCSE9RYE2xLifEYUJgMNpgGVITJOGcOZEkVinDa4G3hiESMSQ-xRjSDfCI7dAGi1khhAm2FcJyPpFg9WWsAT7weI8Q+-hrKw1MnZJcwQoLcnKLrfwJiqpmIen5QYgVgqfSYMQVAqBLS2jRHgYgNi8hR3nCKf4V1EhQVSLGauxR7gpiwZUJIUdAnJ2FqnEJo0ML+QiSFMKKS4xzjTJmLJbjQQxlhlg-KKQqgVHhlBEUwQglDWqR3MaoCWptU8k03ICRvzpSiJxRIgljrBHnBDQM0ZVzVHghUh+VTpLmJLMoc4ZBIBNLiEUG+LIo6wSeIETRPxxz2KAiURuUZRTlJEQA4JxzQkakzq9d6USYmoASRMZJgNEoqxFNvBIu0b7fL1l0n4A4vzvBZDfXah8+L7N+YNLyNUaklmBdnXOeArkxGDBOIZKLg5ouSp8M+pV2L7wOlEBIoziUjQmeqOZSQ5zRgzPDf84pOQzknDvNk4IMZGTZjyzumhu4lgJo7C8TS-b5XrjEQ+1c4jxBnJUZhLwoyPGHE5aMBKhaHLEU-YBZLnogpzmC2JkKklapZHOKcrNDpa0ecBCOkZt7cSqPvbZOKlU21VUC51FKonYBoBMAgNBoVryBnA71CZG4pDKAG54M43g6N2RUANqQnKxGjUAu2j142gsaTCmmTEoxfl9Rjf1k5C0G3+EUMNSYMYQjNdW0WsamCv1nuAykTbla+wHPGMEm1ygqMePrF5280zimwVajKVaDmiIoTW3AckFAwAgNOjNsLfYvBCJ8RdTk8FglTLlSMJlXKmS5Lgzikp91-LGQ62tGImm63VozZuLMMbihnMHdW0ZnLMjSNan9hLH6MEFfcb8oq-yrglUBaDPC4NckjGCYS1RCF1CAA */
+  /** @xstate-layout N4IgpgJg5mDOIC5QBsD2UCWA7ABAJzE1gBcw8cBbAQwGMALbMAOnrBoGscBXWM2HElVIBiCKizNsAN1TtmaTLgJFS5avUYs6bTjz4DiQsAmmoaQjOIDaABgC6iUAAdUsDMUtZHIAB6IAtACMAJwATEwAbACsNlERAByhERE2NsERADQgAJ4BAOw2AMxMUfEALGWB8TaBEcE28cEAvk1ZCtj4hBgkZJS0DBJMyt2qOABmaADuTLB0qJOdKr0UqBBUyMIAYgCSADK7APoAqgDKAKIASgByAIIAsmfeLm4e4t5+CP5RoWVMITYRQrBeIg2LRLK5T5VeKRMJRMqhcrBPKFQJlPItNroDrDHpqfqaXGjCbzGZzBZE5ardZbPaHAAKNxOJwA6gB5C4AESerncnneAWCwSYAIaZUKhW+8SiyIhAVCNl+lQBQsK8UCEqKmJA7SUXTxfQ0g0p5BJ01m80WIypaw2p0utweBwAQrsjhceS9+UhfAFqoEmGU0vE8grqnVAlE5Z9yiKooEkj84nkQoUytrdVaDeoBswTeMpmTLfmVrbhCcjs67tsACoHC5nADi2xONcunr5bx9H38oW+JVF9UBhVCo9K0Y1EUiZW+gTyyXF6MKGNaOuxeqW+KNef1xMLFopu5tNMZzPZXJdbo9Puena83cQtRsJQi84RNUCisKgOj-mqJRDMpgiiECEjKdVCgzdcs1GHNCSPU1Cz0PArioCgwDOPA8FpfZjnOa57keG9eVee9QB7NVfjCap52A196jKX8ESYFEU1CVEFRA+I1SgxQYOWAljQQgtSSoSYqD5LAoAuBDRHESQsBkOQmEzEtBJ3TcROmMSJI8KSZM3ExFLMCxrHsDtSIFT5ShhPJynA0JgUjApGJyR9uJKb9OPAypJQaXicWEuChM0s0mCcKhYFgSZUDwCBMOwnZcNPVkOW5YivS7ciAk-X4anneM+0qdUkmjYp6hReEUgiMoUgqcUAo3a0t1zFToLCg8cEzUsaSShkmVSrkLO9bKECAgNghnGw7MCOcEhTX94mSEoipBBFX1DQJGv4lrNEzDryS66Ceo2FLz05S93WGrLfQQT9QjyEoExRWqQMmwpFoBSII1qkJ1SFUJtrU7c2r4g7LW66kNgrKtawOXY2WbK5rrI267N+b4UwiT8F2iPJf1fKchSWxIHqW8CttXVSgvU0GOjCiKopiuKEpw-qzzSlGrNmxJIlKGVkUqWqlsW6ImHYupauBGyZyBmmQf2wsdMkqBdnXOTBlMZTqc04L5HapXxJVtXFCMmRzFI2wHAyu9uYTYo2NKSpanYxFfzVKJxeBAppsKWIR3TKnoOB1rFdEo29NV9WyDwWLwuQIQxliig6aa7NabD7SI+wKPTdMC3PCtrmHzu2bhTiIofOd9V4iY8CSn50pURKxyWlXLBVjgbwdeaw1WtYDhuF4PB+EEUhi9Gv9+0qeNpXjQFhd-BjIhsJNQ1HMvA6xPiQ-g0L90OksoYn26gmRJ6YmqNVgjTOpf3uyJJQiRzyhHB6ATl3XafzMLkNQ9CEpMGIKgVABwThzDwMQE+PZ0QBmSHEBM78kiyjcqXZ8MoEgAx+MiJyn9e56yGMJX+w9-4YSwtAgIQFPbwOxqOAoyD8aoOXCUdI9Qwh2WxsEEIW81w73lq1H+htdI5wMs1ChMYaiBmDKGBoKpIzRgVFODBjQwjYLyMiKIeD04g0EaSE0kBxF-kkUGb2YY5FRlQYiAMQE0yJDsqET8IYtGwW-kQwsjNoqxXilhIBIDwGxSgTbSyJc0S2TssBdiI4-ZPwnH7P4M4HHRPRMBBqQc+Ffx0W40kHjmbeLwOIhMvw8jhO+BKdiRQ4jRiiI9NE3xylrVsYDNJgUMkCKyZMQxiRPYmJDGYiMFjIS9mKYGHGjQRy0TSM4gSCsDakk6pDW04j1EBlDPORyz1n7glQUYmEDQOE4wqSiKZu1BiZ3CpFTxLMfHANQP4yBBTETCkrnURUNVUjLgJsBQMwIarLjsl+HhPdtGh1mdMHJXjAHYBoLFAgNBAnOBIiNW6CZGgilvgxN5RRGGDOfuEICIYgRJHFKiY5fc9qgvOUzCF5CglIo+AmMWzyMVBixb+ecMJ8XDlDBURUpKCFnOVpHE22BxG9JfHZOy3ECpu22TOKcvSHEEoetjSCzS04uJmWDQsCgYAQG2KjW8wTRrjSYJNGIM05ohkCO7bGXsQypBRP7H4EQ+UZ1BeI2qj0zXTXVJaha2yb7lz7DEWqYJvwurVTtMlEhOnzhGbPECtRb6122Z+BMK0QIAjiJjFcLQgA */
   createMachine(
     {
-      context: {
-        userStatus: {} as IUserStatus,
-        errorMessage: undefined as string | undefined,
-        userName: '',
-        password: '',
-      },
+      context: {userStatus: {} as IUserStatus, userName: '', password: ''},
       tsTypes: {} as import('./loginMachine.typegen').Typegen0,
       schema: {
         services: {} as {
@@ -53,9 +48,6 @@ export const loginMachine =
               type: 'SUBMIT_LOGIN';
             }
           | {
-              type: 'try again';
-            }
-          | {
               type: 'FILL_USERNAME';
               value: string;
             }
@@ -87,19 +79,6 @@ export const loginMachine =
                 target: 'register flow',
               },
             ],
-            onError: [
-              {
-                actions: 'assignUserStatusErrorToContext',
-                target: 'show alert error',
-              },
-            ],
-          },
-        },
-        'show alert error': {
-          on: {
-            'try again': {
-              target: 'check users state',
-            },
           },
         },
         'register flow': {
@@ -210,8 +189,8 @@ export const loginMachine =
               },
               on: {
                 FILL_PASSWORD: {
-                  target: 'show login modal',
                   actions: 'assignPasswordInputToContext',
+                  target: 'show login modal',
                 },
               },
             },
@@ -255,11 +234,6 @@ export const loginMachine =
           // });
           return {
             userStatus: event.data,
-          };
-        }),
-        assignUserStatusErrorToContext: assign((context, event) => {
-          return {
-            errorMessage: (event.data as Error).message,
           };
         }),
         assignUserNameInputToContext: assign((context, event) => {
