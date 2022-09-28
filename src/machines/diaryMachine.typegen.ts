@@ -2,9 +2,6 @@
 
 export interface Typegen0 {
   '@@xstate/typegen': true;
-  eventsCausingActions: {
-    assignDiaryListToContext: 'done.invoke.diary machine.loadingDiaryList:invocation[0]';
-  };
   internalEvents: {
     'done.invoke.diary machine.loadingDiaryList:invocation[0]': {
       type: 'done.invoke.diary machine.loadingDiaryList:invocation[0]';
@@ -23,6 +20,9 @@ export interface Typegen0 {
     services: 'getDiaryList' | 'backuping' | 'restoring';
     guards: never;
     delays: never;
+  };
+  eventsCausingActions: {
+    assignDiaryListToContext: 'done.invoke.diary machine.loadingDiaryList:invocation[0]';
   };
   eventsCausingServices: {
     getDiaryList: 'DIARYLIST';

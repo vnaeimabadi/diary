@@ -2,11 +2,6 @@
 
 export interface Typegen0 {
   '@@xstate/typegen': true;
-  eventsCausingActions: {
-    assignUserStatusToContext: 'done.invoke.login register machine.check users state:invocation[0]';
-    assignUserNameInputToContext: 'FILL_USERNAME';
-    assignPasswordInputToContext: 'FILL_PASSWORD';
-  };
   internalEvents: {
     'done.invoke.login register machine.check users state:invocation[0]': {
       type: 'done.invoke.login register machine.check users state:invocation[0]';
@@ -25,6 +20,11 @@ export interface Typegen0 {
     services: 'checkUserStatus' | 'register' | 'login';
     guards: never;
     delays: never;
+  };
+  eventsCausingActions: {
+    assignUserStatusToContext: 'done.invoke.login register machine.check users state:invocation[0]';
+    assignUserNameInputToContext: 'FILL_USERNAME';
+    assignPasswordInputToContext: 'FILL_PASSWORD';
   };
   eventsCausingServices: {
     checkUserStatus: 'xstate.init';
