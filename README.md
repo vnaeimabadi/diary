@@ -59,3 +59,30 @@
   * success: show login page
     * aa
   * error: show register page 
+  
+* to generate debug release:
+* step0: npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+*
+* Step1: Go to android directory:
+  cd android
+
+* Step2: Now in this android folder, run this command:
+  for mac/linux: ./gradlew assembleDebug
+  for windows: gradlew assembleDebug or .\gradlew assembleDebug
+  for release mode: gradlew bundleRelease or ./gradlew bundleRelease
+
+* Use these steps if have error (Execution failed for task ':app:mergeDebugResources'. react native):
+  0.)npx react-native bundle --platform android --dev false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res
+  
+  1.) cd android
+
+  2.) gradlew clean
+
+  3.) Now run the project.
+
+## show preview of readme in vscode press ctrl+shift+v
+
+## error spawn ./gradlew eacces react native ubuntu
+
+* fixed this problem with:
+* chmod 755 android/gradlew
