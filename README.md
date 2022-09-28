@@ -1,4 +1,4 @@
-## for create react-native app:
+# for create react-native app:
 
   * npx react-native init Project-Name
 
